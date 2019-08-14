@@ -13,7 +13,7 @@ class CreateIeventCategoryEventTable extends Migration
    */
   public function up()
   {
-    Schema::create('ievent_category_event', function (Blueprint $table) {
+    Schema::create('ievent__category_event', function (Blueprint $table) {
       $table->increments('id');
       $table->integer('event_id')->unsigned();
       $table->foreign('event_id')->references('id')->on('ievent__events')->onDelete('cascade');
@@ -30,6 +30,6 @@ class CreateIeventCategoryEventTable extends Migration
    */
   public function down()
   {
-    Schema::dropIfExists('ievent_category_event');
+    Schema::dropIfExists('ievent__category_event');
   }
 }
