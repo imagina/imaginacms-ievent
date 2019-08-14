@@ -7,7 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class CategoryTranslation extends Model
 {
     public $timestamps = false;
-    protected $fillable = ['title','description','slug','meta_title', 'meta_description', 'meta_keywords','options_translate'];
+
+    protected $fillable = [
+      'title',
+      'description',
+      'slug',
+      'meta_title',
+      'meta_description',
+      'meta_keywords',
+      'options_translate'
+    ];
     protected $table = 'ievent__category_translations';
 
     protected  $casts = [

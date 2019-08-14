@@ -10,8 +10,27 @@ class Category extends Model
     use Translatable;
 
     protected $table = 'ievent__categories';
-    public $translatedAttributes = ['title','description','slug','meta_title', 'meta_description', 'meta_keywords','options_translate'];
-    protected $fillable = ['title','description','slug','options_translate','meta_title', 'meta_description', 'meta_keywords','parent_id','options'];
+
+    public $translatedAttributes = [
+      'title',
+      'description',
+      'slug',
+      'meta_title',
+      'meta_description',
+      'meta_keywords',
+      'options_translate'
+    ];
+    protected $fillable = [
+      'title',
+      'description',
+      'slug',
+      'options_translate',
+      'meta_title',
+      'meta_description',
+      'meta_keywords',
+      'parent_id',
+      'options'
+    ];
     protected  $casts = [
         'options'=>'array'
     ];
