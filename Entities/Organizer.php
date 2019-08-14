@@ -10,8 +10,26 @@ class Organizer extends Model
     use Translatable;
 
     protected $table = 'ievent__organizers';
-    public $translatedAttributes = [];
-    protected $fillable = [];
+
+    public $translatedAttributes = [
+      'name',
+      'description',
+      'slug',
+      'meta_title',
+      'meta_description',
+      'meta_keywords',
+    ];
+    protected $fillable = [
+      'contact',
+      'address',
+      'options',
+      'name',
+      'description',
+      'slug',
+      'meta_title',
+      'meta_description',
+      'meta_keywords',
+    ];
 
     /**
      * Magic Method modification to allow dynamic relations to other entities.

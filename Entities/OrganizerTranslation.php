@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class OrganizerTranslation extends Model
 {
     public $timestamps = false;
-    protected $fillable = [];
+
+    protected $fillable = [
+      'name',
+      'description',
+      'slug',
+      'meta_title',
+      'meta_description',
+      'meta_keywords',
+    ];
+
     protected $table = 'ievent__organizer_translations';
 }
