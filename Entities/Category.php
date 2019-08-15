@@ -11,6 +11,8 @@ class Category extends Model
 
   protected $table = 'ievent__categories';
 
+  protected $fakeColumns = ['options'];
+
   public $translatedAttributes = [
     'title',
     'description',
@@ -48,20 +50,11 @@ class Category extends Model
   }
 
   public function getOptionsAttribute($value){
-    return json_decode($value);
-  }
-
-  public function getMainImageAttribute()
-  {
-    $thumbnail = $this->files()->where('zone', 'mainimage')->first() ?? null;
-    if ($thumbnail === null) {
-      $thumbnail = (object)['path' => null, 'main-type' => 'image/jpeg'];
-      if (isset($this->options->mainimage)) {
-        $thumbnail->path = $this->options->mainimage;
-      }
-      $thumbnail->path = 'modules/ievent/img/default.jpg';
+    try {
+      return json_decode(json_decode($value));
+    } catch (\Exception $e) {
+      return json_decode($value);
     }
-    return $thumbnail;
   }
 
   /**
