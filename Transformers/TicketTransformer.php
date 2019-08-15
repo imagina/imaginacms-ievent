@@ -11,6 +11,15 @@ class TicketTransformer extends Resource
     $data = [
       'id' => $this->id,
     ];
+    $filter = json_decode($request->filter);
+    // Return data with available translations
+    if (isset($filter->allTranslations) && $filter->allTranslations) {
+      // Get langs avaliables
+      $languages = \LaravelLocalization::getSupportedLocales();
+      foreach ($languages as $lang => $value) {
+
+      }
+    }
     return $data;
   }
 }
