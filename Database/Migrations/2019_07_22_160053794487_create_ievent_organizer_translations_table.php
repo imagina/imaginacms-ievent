@@ -25,6 +25,7 @@ class CreateIeventOrganizerTranslationsTable extends Migration
       $table->integer('organizer_id')->unsigned();
       $table->unique(['organizer_id', 'locale']);
       $table->foreign('organizer_id')->references('id')->on('ievent__organizers')->onDelete('cascade');
+      $table->text('options_translate')->nullable();
     });
   }
 

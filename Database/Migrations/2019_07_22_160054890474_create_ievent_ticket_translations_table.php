@@ -19,6 +19,7 @@ class CreateIeventTicketTranslationsTable extends Migration
       $table->string('locale')->index();
       $table->unique(['ticket_id', 'locale']);
       $table->foreign('ticket_id')->references('id')->on('ievent__tickets')->onDelete('cascade');
+      $table->text('options_translate')->nullable();
     });
   }
 
