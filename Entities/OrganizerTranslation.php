@@ -15,6 +15,7 @@ class OrganizerTranslation extends Model
       'meta_title',
       'meta_description',
       'meta_keywords',
+      'options_translate'
     ];
 
     protected $table = 'ievent__organizer_translations';

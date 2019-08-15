@@ -18,6 +18,7 @@ class Organizer extends Model
       'meta_title',
       'meta_description',
       'meta_keywords',
+      'options_translate'
     ];
     protected $fillable = [
       'contact',
@@ -29,6 +30,7 @@ class Organizer extends Model
       'meta_title',
       'meta_description',
       'meta_keywords',
+      'options_translate'
     ];
 
     /**

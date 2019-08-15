@@ -16,6 +16,7 @@ class EventTranslation extends Model
       'meta_title',
       'meta_description',
       'meta_keywords',
+      'options_translate'
     ];
 
     protected $table = 'ievent__event_translations';

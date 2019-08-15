@@ -22,6 +22,7 @@ class Event extends Model
     'meta_title',
     'meta_description',
     'meta_keywords',
+    'options_translate'
   ];
 
   protected $fillable = [
@@ -44,6 +45,7 @@ class Event extends Model
     'meta_title',
     'meta_description',
     'meta_keywords',
+    'options_translate'
   ];
 
   public function events(){
