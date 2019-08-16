@@ -38,6 +38,7 @@ class Event extends Model
     'status',
     'options',
     'user_id',
+
     'summary',
     'title',
     'description',
@@ -48,8 +49,22 @@ class Event extends Model
     'options_translate'
   ];
 
-  public function events(){
-    return $this->belongsToMany(Category::class,'ievent_category_event');
+
+  protected $casts = [
+    'options' => 'array'
+  ];
+
+  public function getOptionsAttribute($value)
+  {
+    try {
+      return json_decode(json_decode($value));
+    } catch (\Exception $e) {
+      return json_decode($value);
+    }
+  }
+
+  public function categories(){
+    return $this->belongsToMany(Category::class, 'ievent__category_event');
   }
 
   public function getMainImageAttribute()
@@ -78,21 +93,13 @@ class Event extends Model
 
   public function getGalleryAttribute()
   {
-    $images = Storage::disk('publicmedia')->files('assets/iblog/post/gallery/' . $this->id);
-    if (count($images)) {
-      $response = array();
-      foreach ($images as $image) {
-        $response = ["mimetype" => "image/jpeg", "path" => $image];
-      }
-    } else {
-      $gallery = $this->filesByZone('gallery')->get();
-      $response = [];
-      foreach ($gallery as $img) {
-        array_push($response, [
-          'mimeType' => $img->mimetype,
-          'path' => $img->path_string
-        ]);
-      }
+    $gallery = $this->filesByZone('gallery')->get();
+    $response = [];
+    foreach ($gallery as $img) {
+      array_push($response, [
+        'mimeType' => $img->mimetype,
+        'path' => $img->path_string
+      ]);
     }
     return json_decode(json_encode($response));
   }

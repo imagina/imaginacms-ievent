@@ -7,51 +7,68 @@ use Illuminate\Database\Eloquent\Model;
 
 class Organizer extends Model
 {
-    use Translatable;
+  use Translatable;
 
-    protected $table = 'ievent__organizers';
+  protected $table = 'ievent__organizers';
 
-    public $translatedAttributes = [
-      'name',
-      'description',
-      'slug',
-      'meta_title',
-      'meta_description',
-      'meta_keywords',
-      'options_translate'
-    ];
-    protected $fillable = [
-      'contact',
-      'address',
-      'options',
-      'name',
-      'description',
-      'slug',
-      'meta_title',
-      'meta_description',
-      'meta_keywords',
-      'options_translate'
-    ];
+  protected static $entityNamespace = 'ievent/organizer';
 
-    /**
-     * Magic Method modification to allow dynamic relations to other entities.
-     * @var $value
-     * @var $destination_path
-     * @return string
-     */
-    public function __call($method, $parameters)
-    {
-        #i: Convert array to dot notation
-        $config = implode('.', ['asgard.ievent.config.relations.organizer', $method]);
+  protected $fakeColumns = ['options'];
 
-        #i: Relation method resolver
-        if (config()->has($config)) {
-            $function = config()->get($config);
+  public $translatedAttributes = [
+    'name',
+    'description',
+    'slug',
+    'meta_title',
+    'meta_description',
+    'meta_keywords',
+    'options_translate'
+  ];
+  protected $fillable = [
+    'contact',
+    'address',
+    'options',
+    'name',
+    'description',
+    'slug',
+    'meta_title',
+    'meta_description',
+    'meta_keywords',
+    'options_translate'
+  ];
 
-            return $function($this);
-        }
+  protected $casts = [
+    'options' => 'array'
+  ];
 
-        #i: No relation found, return the call to parent (Eloquent) to handle it.
-        return parent::__call($method, $parameters);
+  public function getOptionsAttribute($value)
+  {
+    try {
+      return json_decode(json_decode($value));
+    } catch (\Exception $e) {
+      return json_decode($value);
     }
+  }
+
+  /**
+   * Magic Method modification to allow dynamic relations to other entities.
+   * @var $value
+   * @var $destination_path
+   * @return string
+   */
+  public function __call($method, $parameters)
+  {
+      #i: Convert array to dot notation
+      $config = implode('.', ['asgard.ievent.config.relations.organizer', $method]);
+
+      #i: Relation method resolver
+      if (config()->has($config)) {
+          $function = config()->get($config);
+
+          return $function($this);
+      }
+
+      #i: No relation found, return the call to parent (Eloquent) to handle it.
+      return parent::__call($method, $parameters);
+  }
 }

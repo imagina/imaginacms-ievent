@@ -46,7 +46,7 @@ class Category extends Model
   }
 
   public function events(){
-    return $this->belongsToMany(Event::class,'ievent_category_event');
+    return $this->belongsToMany(Event::class,'ievent__category_event');
   }
 
   public function getOptionsAttribute($value){
