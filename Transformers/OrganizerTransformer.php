@@ -8,11 +8,14 @@ class OrganizerTransformer extends Resource
 {
   public function toArray($request)
   {
+    $locale = \LaravelLocalization::setLocale() ?: \App::getLocale();
+
     $data = [
       'id' => $this->id,
       'contact' => $this->when( $this->contact, $this->contact ),
       'address' => $this->when( $this->address, $this->address ),
       'options' => $this->when( $this->options, $this->options ),
+      'name' => $this->hasTranslation($locale) ? $this->translate("$locale")['name'] : '',
     ];
     $filter = json_decode($request->filter);
     // Return data with available translations
