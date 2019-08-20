@@ -5,6 +5,8 @@ namespace Modules\Ievent\Repositories\Eloquent;
 use Modules\Ievent\Repositories\EventRepository;
 use Modules\Core\Repositories\Eloquent\EloquentBaseRepository;
 
+use Modules\Ievent\Entities\Status;
+
 //Events media
 use Modules\Ihelpers\Events\CreateMedia;
 use Modules\Ihelpers\Events\UpdateMedia;
@@ -55,6 +57,18 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
         $orderWay = $filter->order->way ?? 'desc';//Default way
         $query->orderBy($orderByField, $orderWay);//Add order to query
       }
+
+      //Order by Now
+      if (isset($filter->orderByNow) && $filter->orderByNow ) {
+        $query->where('start_date','>=',date('Y-m-d'))->whereStatus(Status::PUBLISHED);
+      }
+
+      //Order by Now
+      if (isset($filter->status) && is_integer($filter->status)) {
+        $query->where('status', $filter->status);
+      }
+
+
       //Filter by parent ID
       if (isset($filter->parentId)) {
         $query->where("parent_id", $filter->parentId);
@@ -110,6 +124,9 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
   public function create($data)
   {
     $category = $this->model->create($data);
+    if ($category) {
+      $category->categories()->sync(array_get($data, 'categories', []));
+    }
     event(new CreateMedia($category, $data));
     return $category;
   }
@@ -126,6 +143,9 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
     }
     /*== REQUEST ==*/
     $model = $query->where($field ?? 'id', $criteria)->first();
+    if ($model) {
+      $model->categories()->sync(array_get($data, 'categories', []));
+    }
     event(new UpdateMedia($model, $data));//Event to Update media
     return $model ? $model->update((array)$data) : false;
   }

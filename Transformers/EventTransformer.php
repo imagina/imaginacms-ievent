@@ -8,6 +8,7 @@ class EventTransformer extends Resource
 {
   public function toArray($request)
   {
+    $locale = \LaravelLocalization::setLocale() ?: \App::getLocale();
     $data = [
       'id' => $this->id,
       'startDate' => $this->when( $this->start_date, $this->start_date ),
@@ -19,9 +20,16 @@ class EventTransformer extends Resource
       'lat' => $this->when( $this->lat, $this->lat ),
       'price' => $this->when( $this->price, $this->price ),
       'organizerId' => $this->when( $this->organizer_id, $this->organizer_id ),
-      'status' => $this->when( $this->status, $this->status ),
+      'status' => $this->status,
       'options' => $this->when( $this->options, $this->options ),
       'userId' => $this->when( $this->user_id, $this->user_id ),
+      'summary' => $this->when( $this->summary, $this->summary ),
+      'title' => $this->when( $this->title, $this->title ),
+      'description' => $this->when( $this->description, $this->description ),
+      'slug' => $this->when( $this->slug, $this->slug ),
+      'categories' => CategoryTransformer::collection($this->whenLoaded('categories')),
+      'mainImage' => $this->mainImage,
+      'gallery' => $this->gallery,
 
     ];
     $filter = json_decode($request->filter);
