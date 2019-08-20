@@ -5,11 +5,6 @@ namespace Modules\Ievent\Repositories\Eloquent;
 use Modules\Ievent\Repositories\CategoryRepository;
 use Modules\Core\Repositories\Eloquent\EloquentBaseRepository;
 
-//Events media
-use Modules\Ihelpers\Events\CreateMedia;
-use Modules\Ihelpers\Events\UpdateMedia;
-use Modules\Ihelpers\Events\DeleteMedia;
-
 class EloquentCategoryRepository extends EloquentBaseRepository implements CategoryRepository
 {
   public function getItemsBy($params)
@@ -110,7 +105,6 @@ class EloquentCategoryRepository extends EloquentBaseRepository implements Categ
   public function create($data)
   {
     $category = $this->model->create($data);
-    event(new CreateMedia($category, $data));
     return $category;
   }
   public function updateBy($criteria, $data, $params = false)
@@ -126,7 +120,6 @@ class EloquentCategoryRepository extends EloquentBaseRepository implements Categ
     }
     /*== REQUEST ==*/
     $model = $query->where($field ?? 'id', $criteria)->first();
-    event(new UpdateMedia($model, $data));//Event to Update media
     return $model ? $model->update((array)$data) : false;
   }
   public function deleteBy($criteria, $params = false)
@@ -141,7 +134,6 @@ class EloquentCategoryRepository extends EloquentBaseRepository implements Categ
     }
     /*== REQUEST ==*/
     $model = $query->where($field ?? 'id', $criteria)->first();
-    event(new DeleteMedia($model->id, get_class($model)));//Event to Delete media
     $model ? $model->delete() : false;
   }
 }

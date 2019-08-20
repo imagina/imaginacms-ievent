@@ -8,10 +8,12 @@ class CategoryTransformer extends Resource
 {
   public function toArray($request)
   {
+    $locale = \LaravelLocalization::setLocale() ?: \App::getLocale();
     $data = [
       'id' => $this->id,
       'parentId' => $this->when($this->parent_id, $this->parent_id),
       'options' => $this->when($this->options, $this->options),
+      'title' => $this->hasTranslation($locale) ? $this->translate("$locale")['title'] : '',
     ];
     $filter = json_decode($request->filter);
     // Return data with available translations
