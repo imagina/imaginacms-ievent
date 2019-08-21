@@ -108,6 +108,17 @@ class IeventServiceProvider extends ServiceProvider
                 return new \Modules\Ievent\Repositories\Cache\CacheTicketDecorator($repository);
             }
         );
+
+      $this->app->bind(
+        'Modules\Ievent\Repositories\UserRepository',
+        function () {
+          $repository = new \Modules\Ievent\Repositories\Eloquent\EloquentUserRepository(new \Modules\Ievent\Entities\User());
+          if (!config('app.cache')) {
+            return $repository;
+          }
+          return new \Modules\Ievent\Repositories\Cache\CacheUserApiDecorator($repository);
+        }
+      );
 // add bindings
 
 

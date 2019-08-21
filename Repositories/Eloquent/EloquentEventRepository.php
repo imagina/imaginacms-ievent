@@ -60,7 +60,7 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
 
       //Order by Now
       if (isset($filter->orderByNow) && $filter->orderByNow ) {
-        $query->where('start_date','>=',date('Y-m-d'))->whereStatus(Status::PUBLISHED);
+        $query->where('end_date','>=',date('Y-m-d'))->whereStatus(Status::PUBLISHED);
       }
 
       //Order by Now

@@ -12,4 +12,7 @@ $router->group(['prefix' => '/ievent/v1'], function (Router $router) {
 
   // Organizer Routes
   require('ApiRoutes/organizerRoutes.php');
+
+  // Birthdays
+  require ('ApiRoutes/birthdayRoutes.php');
 });
