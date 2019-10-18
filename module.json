@@ -1,7 +1,7 @@
 {
     "name": "Ievent",
     "alias": "ievent",
-    "description": "",
+    "description": "The Event Module for AsgardCMS provides simple way to store events in the database and supports event repeat",
     "keywords": [],
     "version": "1.0.0",
 	"active": 1,
