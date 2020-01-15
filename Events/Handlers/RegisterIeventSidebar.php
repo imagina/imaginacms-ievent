@@ -37,14 +37,14 @@ class RegisterIeventSidebar implements \Maatwebsite\Sidebar\SidebarExtender
     public function extendWith(Menu $menu)
     {
         $menu->group(trans('core::sidebar.content'), function (Group $group) {
-            $group->item(trans('ievent::ievents.title.ievents'), function (Item $item) {
-                $item->icon('fa fa-copy');
+            $group->item(trans('ievent::common.ievent'), function (Item $item) {
+                $item->icon('fa fa-calendar-check-o');
                 $item->weight(10);
                 $item->authorize(
                      /* append */
                 );
                 $item->item(trans('ievent::categories.title.categories'), function (Item $item) {
-                    $item->icon('fa fa-copy');
+                    $item->icon('fa fa-list');
                     $item->weight(0);
                     $item->append('admin.ievent.category.create');
                     $item->route('admin.ievent.category.index');
@@ -62,7 +62,7 @@ class RegisterIeventSidebar implements \Maatwebsite\Sidebar\SidebarExtender
                     );
                 });
                 $item->item(trans('ievent::events.title.events'), function (Item $item) {
-                    $item->icon('fa fa-copy');
+                    $item->icon('fa fa-calendar-o');
                     $item->weight(0);
                     $item->append('admin.ievent.event.create');
                     $item->route('admin.ievent.event.index');
