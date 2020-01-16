@@ -7,8 +7,24 @@ return [
         "read more"=>"Read More"
     ],
     'table' => [
+        'id'=>'Id',
+        'title'=>'Title',
+        'slug'=>'Slug',
     ],
     'form' => [
+        'title' => 'Title',
+        'description' => 'Description',
+        'slug' => 'Slug',
+        'summary' => 'Summary',
+        'metadata'=> 'SEO',
+        'meta_title'=>'Meta Title',
+        'meta_description'=>'Meta Description',
+        'meta_keywords'=>'Keywords',
+        'secondary image'=>'Secondary Image',
+        'image'=>'Main Image',
+        'parent category' => 'Parent Category',
+        'categories' => 'Categories',
+        'gallery' => 'Gallery',
     ],
     'messages' => [
         'title is required'=>'The title is required',

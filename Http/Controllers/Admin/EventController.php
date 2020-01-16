@@ -9,6 +9,10 @@ use Modules\Ievent\Http\Requests\CreateEventRequest;
 use Modules\Ievent\Http\Requests\UpdateEventRequest;
 use Modules\Ievent\Repositories\EventRepository;
 use Modules\Core\Http\Controllers\Admin\AdminBaseController;
+use Modules\Ievent\Repositories\CategoryRepository;
+use Modules\Ievent\Entities\Status;
+use Modules\User\Repositories\RoleRepository;
+use Modules\User\Repositories\UserRepository;
 
 class EventController extends AdminBaseController
 {
@@ -16,12 +20,39 @@ class EventController extends AdminBaseController
      * @var EventRepository
      */
     private $event;
+    /**
+     * @var CategoryRepository
+     */
+    private $category;
+     /**
+     * @var Status
+     */
+    private $status;
+     /**
+     * @var Role
+     */
+    private $role;
 
-    public function __construct(EventRepository $event)
+    /**
+     * @var Role
+     */
+    private $user;
+
+    public function __construct(
+        EventRepository $event,
+        CategoryRepository $category,
+        Status $status,
+        RoleRepository $role,
+        UserRepository $user
+    )
     {
         parent::__construct();
 
         $this->event = $event;
+        $this->category = $category;
+        $this->status = $status;
+        $this->role = $role;
+        $this->user=$user;
     }
 
     /**
@@ -31,9 +62,8 @@ class EventController extends AdminBaseController
      */
     public function index()
     {
-        //$events = $this->event->all();
-
-        return view('ievent::admin.events.index', compact(''));
+        $events = $this->event->all();
+        return view('ievent::admin.events.index', compact('events'));
     }
 
     /**
@@ -43,7 +73,10 @@ class EventController extends AdminBaseController
      */
     public function create()
     {
-        return view('ievent::admin.events.create');
+        $categories = $this->category->all();
+        $status = $this->status->lists();
+        $users= $this->user->all();
+        return view('ievent::admin.events.create',compact('categories','status','users'));
     }
 
     /**

@@ -14,8 +14,17 @@ return [
         'create category' => 'Create a category',
     ],
     'table' => [
+        'id'=>'Id',
+        'title'=>'Title',
+        'slug'=>'Slug',
     ],
     'form' => [
+        'title'=>'Title',
+        'slug'=>'Slug',
+        'description'=>'Description',
+        'parent category'=>'Parent Category',
+        'secondary image'=>'Secondary Image',
+        'image'=>'Main Image'
     ],
     'messages' => [
     ],

@@ -4,10 +4,14 @@ namespace Modules\Ievent\Entities;
 
 use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
+use Laracasts\Presenter\PresentableTrait;
+use Modules\Core\Traits\NamespacedEntity;
+use Modules\Media\Entities\File;
+use Modules\Media\Support\Traits\MediaRelation;
 
 class Category extends Model
 {
-  use Translatable;
+  use Translatable, MediaRelation, PresentableTrait,NamespacedEntity;
 
   protected $table = 'ievent__categories';
 
@@ -56,6 +60,31 @@ class Category extends Model
       return json_decode($value);
     }
   }
+
+  public function getMainImageAttribute()
+    {
+        $thumbnail = $this->files()->where('zone', 'mainimage')->first();
+        if (!$thumbnail) {
+            if (isset($this->options->mainimage)) {
+                $image = [
+                    'mimeType' => 'image/jpeg',
+                    'path' => url($this->options->mainimage)
+                ];
+            } else {
+                $image = [
+                    'mimeType' => 'image/jpeg',
+                    'path' => url('modules/iblog/img/post/default.jpg')
+                ];
+            }
+        } else {
+            $image = [
+                'mimeType' => $thumbnail->mimetype,
+                'path' => $thumbnail->path_string
+            ];
+        }
+        return json_decode(json_encode($image));
+
+    }
 
   /**
    * Magic Method modification to allow dynamic relations to other entities.

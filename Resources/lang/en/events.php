@@ -16,6 +16,12 @@ return [
     'table' => [
     ],
     'form' => [
+        'created at' => 'Created at',
+        'start at' => 'Start at',
+        'end at' => 'End at',
+        'address' => 'Address',
+        'price' => 'Price',
+
     ],
     'messages' => [
     ],

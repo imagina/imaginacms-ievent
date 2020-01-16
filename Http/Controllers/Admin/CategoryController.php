@@ -10,6 +10,7 @@ use Modules\Ievent\Http\Requests\UpdateCategoryRequest;
 use Modules\Ievent\Repositories\CategoryRepository;
 use Modules\Core\Http\Controllers\Admin\AdminBaseController;
 
+
 class CategoryController extends AdminBaseController
 {
     /**
@@ -31,9 +32,8 @@ class CategoryController extends AdminBaseController
      */
     public function index()
     {
-        //$categories = $this->category->all();
-
-        return view('ievent::admin.categories.index', compact(''));
+        $categories = $this->category->all();
+        return view('ievent::admin.categories.index', compact('categories'));
     }
 
     /**
@@ -43,7 +43,8 @@ class CategoryController extends AdminBaseController
      */
     public function create()
     {
-        return view('ievent::admin.categories.create');
+        $categories = $this->category->all();
+        return view('ievent::admin.categories.create',compact('categories'));
     }
 
     /**
@@ -68,7 +69,9 @@ class CategoryController extends AdminBaseController
      */
     public function edit(Category $category)
     {
-        return view('ievent::admin.categories.edit', compact('category'));
+        
+        $categories = $this->category->all();
+        return view('ievent::admin.categories.edit', compact('category','categories'));
     }
 
     /**
@@ -94,9 +97,18 @@ class CategoryController extends AdminBaseController
      */
     public function destroy(Category $category)
     {
-        $this->category->destroy($category);
+        //dd($category);
+        try {
+            $this->category->destroy($category);
 
-        return redirect()->route('admin.ievent.category.index')
-            ->withSuccess(trans('core::core.messages.resource deleted', ['name' => trans('ievent::categories.title.categories')]));
+            return redirect()->route('admin.ievent.category.index')
+                ->withSuccess(trans('core::core.messages.resource deleted', ['name' => trans('ievent::categories.title.categories')]));
+
+         } catch (\Exception $e) {
+            \Log::error($e);
+            return redirect()->back()
+                ->withError(trans('core::core.messages.resource error', ['name' => trans('ievent::category.title.categories')]));
+
+        }
     }
 }
