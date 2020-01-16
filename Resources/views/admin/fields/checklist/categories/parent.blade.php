@@ -8,9 +8,9 @@
 
             @if(count($categories)>0)
                 @php
-                    if(isset($post->categories) && count($post->categories)>0){
+                    if(isset($event->categories) && count($event->categories)>0){
                     $oldCat = array();
-                        foreach ($post->categories as $cat){
+                        foreach ($event->categories as $cat){
                                    array_push($oldCat,$cat->id);
                                }
 
@@ -32,7 +32,7 @@
                                     @php
                                         $children=$category->children
                                     @endphp
-                                    @include('iblog::admin.fields.checklist.categories.children',['children'=>$children])
+                                    @include('ievent::admin.fields.checklist.categories.children',['children'=>$children])
                                 @endif
                             </li>
 

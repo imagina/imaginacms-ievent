@@ -16,7 +16,7 @@
                     @php
                         $children=$child->children
                     @endphp
-                    @include('iblog::admin.fields.checklist.categories.children',['children'=>$children])
+                    @include('ievent:admin.fields.checklist.categories.children',['children'=>$children])
                 @endif
             </li>
 

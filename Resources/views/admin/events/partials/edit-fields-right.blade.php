@@ -11,8 +11,8 @@
             <div class="box-header">
                 <div class="box-tools pull-right">
                     <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                            class="fa fa-minus"></i>
-                                </button>
+                                class="fa fa-minus"></i>
+                    </button>
                 </div>
                 <div class="form-group">
                     <label>{{trans('ievent::common.form.parent category')}}</label>
@@ -21,8 +21,8 @@
             <div class="box-body">
                 <select class="form-control" name="category_id" id="category_id">
                     @foreach ($categories as $category)
-                        <option value="{{$category->id}}" {{ old('category_id', 0) == $category->id ? 'selected' : '' }}> {{$category->title}}
-                                    </option>
+                        <option value="{{$category->id}}" {{ old('category_id', $event->category_id) == $category->id ? 'selected' : '' }}> {{$category->title}}
+                        </option>
                     @endforeach
                 </select><br>
             </div>
@@ -35,16 +35,16 @@
             <div class="box-header">
                 <div class="box-tools pull-right">
                     <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                            class="fa fa-minus"></i>
-                                </button>
+                                class="fa fa-minus"></i>
+                    </button>
                 </div>
                 <div class="form-group">
                     <label>{{trans('ievent::common.form.categories')}}</label>
                 </div>
             </div>
-        <div class="box-body">
-            @include('ievent::admin.fields.checklist.categories.parent')
-        </div>
+            <div class="box-body">
+           @include('ievent::admin.fields.checklist.categories.parent')
+            </div>
         </div>
     </div>
 
@@ -63,34 +63,33 @@
             </div>
             <div class="box-body">
                 <div class="tab-content">
-                    {!! Form::normalInput('address',trans('ievent::events.form.address'), $errors,null,$op) !!}
+                    {!! Form::normalInput('address',trans('ievent::events.form.address'), $errors,$event,$op) !!}
                 </div>
             </div>
         </div>       
-    </div>   
-    
+    </div>  
+
     {{-- start_date --}}
     <div class="col-xs-12 ">
         <div class="box box-primary">
             <div class="box-header">
                 <div class="box-tools pull-right">
                     <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                            class="fa fa-minus"></i>
-                                </button>
+                                class="fa fa-minus"></i>
+                    </button>
                 </div>
                 <div class="form-group">
                     <label>{{trans('ievent::events.form.start at')}}</label>
                 </div>
-            
             </div>
             <div class="box-body">
                 <div class="tab-content">
                     <div class="form-group">
-                        <div class='input-group date' >
-                            <input type='text' name="start_date" id="start_date" class="form-control" value="{{date('Y-m-d H:i:s')}}"/>
-                            <span class="input-group-addon">
-                                <span class="glyphicon glyphicon-calendar"></span>
-                            </span>
+                        <div class='input-group date'>
+                            <input type='text' name="start_date" id="start_date" class="form-control" value="{{$event->start_date}}"/>
+                            <span class="input-group-addon"><span
+                                        class="glyphicon glyphicon-calendar"></span>
+        </span>
                         </div>
                     </div>
                 </div>
@@ -115,7 +114,7 @@
                 <div class="tab-content">
                     <div class="form-group">
                         <div class='input-group date' >
-                            <input type='text' name="end_date" id="end_date" class="form-control" value="{{date('Y-m-d H:i:s')}}"/>
+                            <input type='text' name="end_date" id="end_date" class="form-control" value="{{$event->end_date}}"/>
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-calendar"></span>
                             </span>
@@ -126,7 +125,6 @@
         </div>
     </div>
 
-    
     {{-- Main Imagen--}}
     <div class="col-xs-12 ">
         <div class="box box-primary">
@@ -142,7 +140,7 @@
             </div>
             <div class="box-body">
                 <div class="tab-content">
-                    @mediaSingle('mainimage')
+                    @mediaSingle('mainimage',$event)
                 </div>
             </div>
         </div>
@@ -155,20 +153,20 @@
                 <label>{{trans('iblog::common.status_text')}}</label>
                 <div class="box-tools pull-right">
                     <button type="button" class="btn btn-box-tool"
-                                        data-widget="collapse"><i
-                                            class="fa fa-minus"></i>
+                            data-widget="collapse"><i
+                                class="fa fa-minus"></i>
                     </button>
                 </div>
             </div>
             <div class="box-body ">
                 <div class='form-group{{ $errors->has("status") ? ' has-error' : '' }}'>
-                @foreach($status as $index=>$item)
-                    <label class="radio" for="{{$item}}">
-                        <input type="radio" id="status" name="status"
-                                               value="{{$index}}" {{old('status',0) == $index ? 'checked' : '' }}>
-                                        {{$item}}
-                    </label>
-                @endforeach
+                    @foreach($status as $index=>$item)
+                        <label class="radio" for="{{$item}}">
+                            <input type="radio" id="status" name="status"
+                                   value="{{$index}}" {{old('status',$event->status) == $index ? 'checked' : '' }}>
+                            {{$item}}
+                        </label>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -180,8 +178,8 @@
             <div class="box-header">
                 <div class="box-tools pull-right">
                     <button type="button" class="btn btn-box-tool"
-                                        data-widget="collapse"><i
-                                            class="fa fa-minus"></i>
+                            data-widget="collapse"><i
+                                class="fa fa-minus"></i>
                     </button>
                 </div>
                 <label>{{trans('iblog::post.form.editor')}}</label>
@@ -189,8 +187,8 @@
             <div class="box-body">
                 <select name="user_id" id="user" class="form-control">
                     @foreach ($users as $user)
-                        <option value="{{$user->id }}" {{$user->id == old('user_id') ? 'selected' : ''}}>{{$user->present()->fullname()}}
-                                        - ({{$user->email}})
+                        <option value="{{$user->id }}" {{$user->id == old('user_id',$event->user_id) ? 'selected' : ''}}>{{$user->present()->fullname()}}
+                            - ({{$user->email}})
                         </option>
                     @endforeach
                 </select><br>

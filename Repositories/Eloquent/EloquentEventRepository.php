@@ -130,6 +130,28 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
     event(new CreateMedia($category, $data));
     return $category;
   }
+
+  public function update($model, $data)
+  {
+      $model->update($data);
+
+      $model->categories()->sync(array_get($data, 'categories', []));
+
+      event(new UpdateMedia($model, $data));//Event to Update media
+
+      return $model;
+  }
+
+  public function destroy($model){
+    
+    $model->delete();
+
+    //Event to Delete media
+    event(new DeleteMedia($model->id, get_class($model)));
+
+  }
+
+
   public function updateBy($criteria, $data, $params = false)
   {
     /*== initialize query ==*/

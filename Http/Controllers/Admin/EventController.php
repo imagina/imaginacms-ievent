@@ -87,10 +87,23 @@ class EventController extends AdminBaseController
      */
     public function store(CreateEventRequest $request)
     {
-        $this->event->create($request->all());
 
-        return redirect()->route('admin.ievent.event.index')
+        \DB::beginTransaction();
+        try {
+
+            $this->event->create($request->all());
+            \DB::commit();//Commit to Data Base
+
+            return redirect()->route('admin.ievent.event.index')
             ->withSuccess(trans('core::core.messages.resource created', ['name' => trans('ievent::events.title.events')]));
+
+        } catch (\Exception $e) {
+            \DB::rollback();
+            \Log::error($e);
+            return redirect()->back()
+                ->withError(trans('core::core.messages.resource error', ['name' => trans('ievent::events.title.events')]))->withInput($request->all());
+
+        }
     }
 
     /**
@@ -101,7 +114,10 @@ class EventController extends AdminBaseController
      */
     public function edit(Event $event)
     {
-        return view('ievent::admin.events.edit', compact('event'));
+        $categories = $this->category->all();
+        $status = $this->status->lists();
+        $users= $this->user->all();
+        return view('ievent::admin.events.edit', compact('event','categories','status','users'));
     }
 
     /**
@@ -113,10 +129,23 @@ class EventController extends AdminBaseController
      */
     public function update(Event $event, UpdateEventRequest $request)
     {
-        $this->event->update($event, $request->all());
 
-        return redirect()->route('admin.ievent.event.index')
+        \DB::beginTransaction();
+        try {
+            $this->event->update($event, $request->all());
+            \DB::commit();//Commit to Data Base
+
+            return redirect()->route('admin.ievent.event.index')
             ->withSuccess(trans('core::core.messages.resource updated', ['name' => trans('ievent::events.title.events')]));
+
+        } catch (\Exception $e) {
+            \DB::rollback();
+            \Log::error($e);
+            return redirect()->back()
+                ->withError(trans('core::core.messages.resource error', ['name' => trans('ievent::events.title.events')]))->withInput($request->all());
+
+        }
+  
     }
 
     /**
@@ -127,9 +156,19 @@ class EventController extends AdminBaseController
      */
     public function destroy(Event $event)
     {
-        $this->event->destroy($event);
 
-        return redirect()->route('admin.ievent.event.index')
+        try {
+            $this->event->destroy($event);
+
+            return redirect()->route('admin.ievent.event.index')
             ->withSuccess(trans('core::core.messages.resource deleted', ['name' => trans('ievent::events.title.events')]));
+        
+        } catch (\Exception $e) {
+            \Log::error($e);
+            return redirect()->back()
+                ->withError(trans('core::core.messages.resource error', ['name' => trans('ievent::events.title.events')]));
+
+        }
+
     }
 }
