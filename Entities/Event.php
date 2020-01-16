@@ -37,6 +37,7 @@ class Event extends Model
     'organizer_id',
     'status',
     'options',
+    'category_id',
     'user_id',
 
     'summary',
@@ -65,6 +66,11 @@ class Event extends Model
 
   public function categories(){
     return $this->belongsToMany(Category::class, 'ievent__category_event');
+  }
+
+  public function category()
+  {
+    return $this->belongsTo(Category::class);
   }
 
   public function getMainImageAttribute()
