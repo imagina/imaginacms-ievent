@@ -6,7 +6,7 @@ return [
     'edit resource' => 'Edit events',
     'destroy resource' => 'Destroy events',
     'title' => [
-        'events' => 'Event',
+        'events' => 'Events',
         'create event' => 'Create a event',
         'edit event' => 'Edit a event',
     ],

@@ -6,7 +6,7 @@ return [
     'edit resource' => 'Edit categories',
     'destroy resource' => 'Destroy categories',
     'title' => [
-        'categories' => 'Category',
+        'categories' => 'Categories',
         'create category' => 'Create a category',
         'edit category' => 'Edit a category',
     ],
