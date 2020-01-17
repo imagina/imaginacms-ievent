@@ -73,6 +73,12 @@ class Event extends Model
     return $this->belongsTo(Category::class);
   }
 
+  public function user()
+  {
+      $driver = config('asgard.user.config.driver');
+      return $this->belongsTo("Modules\\User\\Entities\\{$driver}\\User");
+  }
+
   public function getMainImageAttribute()
   {
     $thumbnail = $this->files()->where('zone', 'mainimage')->first();
@@ -108,6 +114,18 @@ class Event extends Model
       ]);
     }
     return json_decode(json_encode($response));
+  }
+
+ 
+  public function getUrlAttribute()
+  {
+
+    if (!isset($this->category->slug)) {
+      $this->category = Category::take(1)->get()->first();
+    }
+
+    return \URL::route(\LaravelLocalization::getCurrentLocale() . '.ievent.event', [$this->category->slug,$this->slug]);
+
   }
 
   /**

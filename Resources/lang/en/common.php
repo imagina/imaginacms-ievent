@@ -2,7 +2,7 @@
 
 return [
     'ievent' => 'Events',
-
+    'uri' => 'events',
     'button' => [
         "read more"=>"Read More"
     ],
