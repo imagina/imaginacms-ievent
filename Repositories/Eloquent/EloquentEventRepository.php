@@ -15,16 +15,6 @@ use Modules\Ihelpers\Events\DeleteMedia;
 class EloquentEventRepository extends EloquentBaseRepository implements EventRepository
 {
 
-  public function whereCategory($id)
-  {
-      $query = $this->model->with('categories','category', 'user', 'translations');
-      $query->whereHas('categories', function ($q) use ($id) {
-          $q->where('category_id', $id);
-      })->whereStatus(Status::PUBLISHED)->where('created_at', '<', date('Y-m-d H:i:s'))->orderBy('created_at', 'DESC');
-
-      return $query->paginate(12);
-  }
-
   public function getItemsBy($params)
   {
     // INITIALIZE QUERY
@@ -197,4 +187,15 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
     event(new DeleteMedia($model->id, get_class($model)));//Event to Delete media
     $model ? $model->delete() : false;
   }
+
+  public function whereCategory($id)
+  {
+      $query = $this->model->with('categories','category', 'user', 'translations');
+      $query->whereHas('categories', function ($q) use ($id) {
+          $q->where('category_id', $id);
+      })->whereStatus(Status::PUBLISHED)->where('created_at', '<', date('Y-m-d H:i:s'))->orderBy('created_at', 'DESC');
+
+      return $query->paginate(12);
+  }
+  
 }

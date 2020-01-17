@@ -21,7 +21,7 @@ return [
         'end at' => 'End at',
         'address' => 'Address',
         'price' => 'Price',
-
+        'hour' => 'Hour',
     ],
     'messages' => [
     ],
