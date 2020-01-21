@@ -5,9 +5,9 @@ use Modules\Ievent\Entities\Event;
 use Modules\User\Entities\Sentinel\User;
 use Modules\Ievent\Entities\Status;
 
-if (!function_exists('ievent_get_posts')) {
+if (!function_exists('ievent_get_events')) {
 
-    function ievent_get_posts($options = array())
+    function ievent_get_events($options = array())
     {
 
         $default_options = array(
@@ -26,10 +26,10 @@ if (!function_exists('ievent_get_posts')) {
 
         $options = array_merge($default_options, $options);
 
-        $post=app('Modules\Iblog\Repositories\PostRepository');
+        $event=app('Modules\Ievent\Repositories\EventRepository');
         $params=json_decode(json_encode(["filter"=>$options,'include'=>['user', 'categories', 'category'],'take'=>$options['take'],'skip'=>$options['skip']]));
 
-        return $post->getItemsBy($params);
+        return $event->getItemsBy($params);
 
     }
 }

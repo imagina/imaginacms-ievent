@@ -69,6 +69,24 @@ return [
     'created_at' => 'Creation date',
     'parent' => 'Parent',
 
+    'frontend' => [
+        'share' => 'Share',
+        'are you interested' => 'Are you interested in this event?'
+    ],
 
+    'months' => [
+        'january' => 'January',
+        'february' => 'February',
+        'march' => 'March',
+        'april' => 'April',
+        'may' => 'May',
+        'june' => 'June',
+        'july' => 'July',
+        'august' => 'August',
+        'september' => 'September',
+        'october' => 'October',
+        'november' => 'November',
+        'december' => 'December',
+    ]
 
 ];
