@@ -7,9 +7,10 @@ use Mockery\CountValidator\Exception;
 use Modules\Core\Http\Controllers\BasePublicController;
 use Modules\Ievent\Repositories\CategoryRepository;
 use Modules\Ievent\Repositories\EventRepository;
-use Request;
+use Illuminate\Http\Request;
 use Route;
 use Modules\Page\Http\Controllers\PublicController as PageController;
+use Modules\Ievent\Entities\Status;
 
 class PublicController extends BasePublicController
 {
@@ -27,7 +28,7 @@ class PublicController extends BasePublicController
         $this->category = $category;
     }
 
-    public function index($slug)
+    public function index($slug,Request $request)
     {
         try{
 
@@ -38,7 +39,23 @@ class PublicController extends BasePublicController
             if (view()->exists($ttpl)) $tpl = $ttpl;
 
             $category = $this->category->findBySlug($slug);
-            $events = $this->event->whereCategory($category->id);
+            //$events = $this->event->whereCategory($category->id);
+
+            $options = array(
+                'categoryId' => $category->id, 
+                'page' => true
+            );
+
+            if($request->status)
+                $options['status'] = (int)$request->status; 
+           
+            if($request->month)
+                $options['month'] = $request->month;
+
+            if($request->year)
+                $options['year'] = $request->year;
+            
+            $events = ievent_get_events($options);
 
             //Get Custom Template.
             $ptpl = "ievent.category.{$category->parent_id}.index";

@@ -11,6 +11,7 @@ if (!function_exists('ievent_get_events')) {
     {
 
         $default_options = array(
+            'categoryId' => null,
             'categories' => null,// categoria o categorias que desee llamar, se envia como arreglo ['categories'=>[1,2,3]]
             'users' => null, //usuario o usuarios que desea llamar, se envia como arreglo ['users'=>[1,2,3]]
             'include' => array(),//id de post a para incluir en una consulta, se envia como arreglo ['id'=>[1,2,3]]
@@ -21,13 +22,19 @@ if (!function_exists('ievent_get_events')) {
             'take' => 5, //Numero de posts a obtener,
             'skip' => 0, //Omitir Cuantos post a llamar
             'order' => ['field'=>'created_at','way'=>'desc'],//orden de llamado
-            'status' => Status::PUBLISHED
+            //'status' => Status::PUBLISHED,
         );
 
         $options = array_merge($default_options, $options);
 
         $event=app('Modules\Ievent\Repositories\EventRepository');
-        $params=json_decode(json_encode(["filter"=>$options,'include'=>['user', 'categories', 'category'],'take'=>$options['take'],'skip'=>$options['skip']]));
+        $params=json_decode(json_encode([
+            "filter"=>$options,
+            'include'=>['user', 'categories', 'category'],
+            'take'=> $options['take'],
+            'skip'=> $options['skip'],
+            'page'=> isset($options['page']) ? $options['page'] : false
+        ]));
 
         return $event->getItemsBy($params);
 

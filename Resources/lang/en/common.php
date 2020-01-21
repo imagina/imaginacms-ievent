@@ -71,7 +71,8 @@ return [
 
     'frontend' => [
         'share' => 'Share',
-        'are you interested' => 'Are you interested in this event?'
+        'are you interested' => 'Are you interested in this event?',
+        'not found' => 'There are no events available',
     ],
 
     'months' => [

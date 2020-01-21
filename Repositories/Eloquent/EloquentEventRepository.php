@@ -69,11 +69,26 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
         $query->where('status', $filter->status);
       }
 
-
       //Filter by parent ID
       if (isset($filter->parentId)) {
         $query->where("parent_id", $filter->parentId);
       }
+
+      //Filter by category Id
+      if (isset($filter->categoryId)) {
+        $query->where("category_id", $filter->categoryId);
+      }
+
+      //Filter by month
+      if (isset($filter->month)) {
+        $query->whereMonth('start_date',"=",$filter->month);
+      }
+
+      //Filter by year
+      if (isset($filter->year)) {
+        $query->whereYear('start_date',"=",$filter->year);
+      }
+
     }
     /*== FIELDS ==*/
     if (isset($params->fields) && count($params->fields))
