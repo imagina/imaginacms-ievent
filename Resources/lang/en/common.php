@@ -73,6 +73,32 @@ return [
         'share' => 'Share',
         'are you interested' => 'Are you interested in this event?',
         'not found' => 'There are no events available',
+        'form' => [
+            'name' => 'Name',
+            'fullname' => 'Fullname',
+            'email' => 'Email',
+            'country' => 'Country',
+            'country reside' => 'Country where you currently reside',
+            'counseling in studies' => 'Counseling in studies',
+            'immigration counseling' => 'Immigration Counseling',
+            'medium for which you' => 'Medium for which you want to be contacted',
+            'another way' => 'Another way',
+            'current country date' => 'Current Country Date',
+            'current country date contacted' => 'Current country date you want to be contacted',
+            'current country time' => 'Current Country Time',
+            'current country time contacted' => 'Current country time in which you want to be contacted',
+            'general remarks' => 'General remarks',
+            'phone' => 'Phone',
+            'profession' => 'Profession / Occupation',
+            'field required' => 'Field required',
+        ],
+        'btns' => [
+            'send' => 'Send',
+            'register' => 'Register',
+        ],
+        'main types of visa' => 'Main types of visa',
+        'points test' => 'Points Test',
+        'schedule your interview' => 'Schedule your interview'
     ],
 
     'months' => [
@@ -89,5 +115,7 @@ return [
         'november' => 'November',
         'december' => 'December',
     ]
+
+
 
 ];
