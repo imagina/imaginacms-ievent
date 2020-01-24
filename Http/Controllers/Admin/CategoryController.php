@@ -67,9 +67,10 @@ class CategoryController extends AdminBaseController
      * @param  Category $category
      * @return Response
      */
-    public function edit(Category $category)
+    public function edit($categoryId)
     {
-        
+       
+        $category = $this->category->find($categoryId);
         $categories = $this->category->all();
         return view('ievent::admin.categories.edit', compact('category','categories'));
     }
@@ -81,8 +82,11 @@ class CategoryController extends AdminBaseController
      * @param  UpdateCategoryRequest $request
      * @return Response
      */
-    public function update(Category $category, UpdateCategoryRequest $request)
+    public function update($categoryId, UpdateCategoryRequest $request)
     {
+
+        $category = $this->category->find($categoryId);
+
         $this->category->update($category, $request->all());
 
         return redirect()->route('admin.ievent.category.index')
@@ -95,9 +99,11 @@ class CategoryController extends AdminBaseController
      * @param  Category $category
      * @return Response
      */
-    public function destroy(Category $category)
+    public function destroy($categoryId)
     {
-        //dd($category);
+
+        $category = $this->category->find($categoryId);
+
         try {
             $this->category->destroy($category);
 

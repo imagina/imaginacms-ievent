@@ -10,8 +10,11 @@ use Modules\Ihelpers\Events\CreateMedia;
 use Modules\Ihelpers\Events\UpdateMedia;
 use Modules\Ihelpers\Events\DeleteMedia;
 
+use Illuminate\Database\Eloquent\Builder;
+
 class EloquentCategoryRepository extends EloquentBaseRepository implements CategoryRepository
 {
+
   public function getItemsBy($params)
   {
     // INITIALIZE QUERY
@@ -71,6 +74,7 @@ class EloquentCategoryRepository extends EloquentBaseRepository implements Categ
       return $query->get();
     }
   }
+
   public function getItem($criteria, $params = false)
   {
     // INITIALIZE QUERY
@@ -152,6 +156,7 @@ class EloquentCategoryRepository extends EloquentBaseRepository implements Categ
     $model = $query->where($field ?? 'id', $criteria)->first();
     return $model ? $model->update((array)$data) : false;
   }
+  
   public function deleteBy($criteria, $params = false)
   {
     /*== initialize query ==*/

@@ -22,17 +22,17 @@ $router->group(['prefix' =>'/ievent'], function (Router $router) {
         'uses' => 'CategoryController@store',
         'middleware' => 'can:ievent.categories.create'
     ]);
-    $router->get('categories/{category}/edit', [
+    $router->get('categories/{categoryId}/edit', [
         'as' => 'admin.ievent.category.edit',
         'uses' => 'CategoryController@edit',
         'middleware' => 'can:ievent.categories.edit'
     ]);
-    $router->put('categories/{category}', [
+    $router->put('categories/{categoryId}', [
         'as' => 'admin.ievent.category.update',
         'uses' => 'CategoryController@update',
         'middleware' => 'can:ievent.categories.edit'
     ]);
-    $router->delete('categories/{category}', [
+    $router->delete('categories/{categoryId}', [
         'as' => 'admin.ievent.category.destroy',
         'uses' => 'CategoryController@destroy',
         'middleware' => 'can:ievent.categories.destroy'
