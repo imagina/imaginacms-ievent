@@ -2,9 +2,9 @@
 
 return [
     'ievent' => 'Events',
-    'uri' => 'events',
+    'uri' => 'eventos',
     'button' => [
-        "read more"=>"Read More"
+        "read more"=>"Leer Más"
     ],
     'table' => [
         'id'=>'Id',
