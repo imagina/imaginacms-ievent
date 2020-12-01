@@ -8,6 +8,8 @@ use Modules\Core\Events\BuildingSidebar;
 use Modules\Core\Events\LoadingBackendTranslations;
 use Modules\Ievent\Events\Handlers\RegisterIeventSidebar;
 
+use Illuminate\Support\Arr;
+
 class IeventServiceProvider extends ServiceProvider
 {
     use CanPublishConfiguration;
@@ -29,10 +31,10 @@ class IeventServiceProvider extends ServiceProvider
         $this->app['events']->listen(BuildingSidebar::class, RegisterIeventSidebar::class);
 
         $this->app['events']->listen(LoadingBackendTranslations::class, function (LoadingBackendTranslations $event) {
-            $event->load('categories', array_dot(trans('ievent::categories')));
-            $event->load('organizers', array_dot(trans('ievent::organizers')));
-            $event->load('events', array_dot(trans('ievent::events')));
-            $event->load('tickets', array_dot(trans('ievent::tickets')));
+            $event->load('categories', Arr::dot(trans('ievent::categories')));
+            $event->load('organizers', Arr::dot(trans('ievent::organizers')));
+            $event->load('events', Arr::dot(trans('ievent::events')));
+            $event->load('tickets', Arr::dot(trans('ievent::tickets')));
             // append translations
 
 

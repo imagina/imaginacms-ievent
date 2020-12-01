@@ -2,7 +2,7 @@
 
 namespace Modules\Ievent\Entities;
 
-use Dimsav\Translatable\Translatable;
+use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Media\Support\Traits\MediaRelation;
 
@@ -116,7 +116,7 @@ class Event extends Model
     return json_decode(json_encode($response));
   }
 
- 
+
   public function getUrlAttribute()
   {
 

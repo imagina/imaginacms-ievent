@@ -2,9 +2,9 @@
 
 namespace Modules\Ievent\Transformers;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class EventTransformer extends Resource
+class EventTransformer extends JsonResource
 {
   public function toArray($request)
   {

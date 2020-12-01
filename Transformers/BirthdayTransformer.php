@@ -2,10 +2,10 @@
 
 namespace Modules\Ievent\Transformers;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Iprofile\Transformers\FieldTransformer;
 
-class BirthdayTransformer extends Resource
+class BirthdayTransformer extends JsonResource
 {
   public function toArray($request)
   {

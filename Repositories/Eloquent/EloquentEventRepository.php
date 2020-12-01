@@ -12,6 +12,8 @@ use Modules\Ihelpers\Events\CreateMedia;
 use Modules\Ihelpers\Events\UpdateMedia;
 use Modules\Ihelpers\Events\DeleteMedia;
 
+use Illuminate\Support\Arr;
+
 class EloquentEventRepository extends EloquentBaseRepository implements EventRepository
 {
 
@@ -141,7 +143,7 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
   {
     $category = $this->model->create($data);
     if ($category) {
-      $category->categories()->sync(array_get($data, 'categories', []));
+      $category->categories()->sync(Arr::get($data, 'categories', []));
     }
     event(new CreateMedia($category, $data));
     return $category;
@@ -151,7 +153,7 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
   {
       $model->update($data);
 
-      $model->categories()->sync(array_get($data, 'categories', []));
+      $model->categories()->sync(Arr::get($data, 'categories', []));
 
       event(new UpdateMedia($model, $data));//Event to Update media
 
@@ -159,7 +161,7 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
   }
 
   public function destroy($model){
-    
+
     $model->delete();
 
     //Event to Delete media
@@ -182,7 +184,7 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
     /*== REQUEST ==*/
     $model = $query->where($field ?? 'id', $criteria)->first();
     if ($model) {
-      $model->categories()->sync(array_get($data, 'categories', []));
+      $model->categories()->sync(Arr::get($data, 'categories', []));
     }
     event(new UpdateMedia($model, $data));//Event to Update media
     return $model ? $model->update((array)$data) : false;
@@ -212,5 +214,5 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
 
       return $query->paginate(12);
   }
-  
+
 }
