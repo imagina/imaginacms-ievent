@@ -15,8 +15,8 @@ class CreateIeventEventsTable extends Migration
     Schema::create('ievent__events', function (Blueprint $table) {
       $table->engine = 'InnoDB';
       $table->increments('id');
-      $table->timestamp('start_date');
-      $table->timestamp('end_date');
+      $table->timestamp('start_date')->nullable();
+      $table->timestamp('end_date')->nullable();
       $table->boolean('repeat');
       $table->boolean('all_day');
       $table->text('address');
