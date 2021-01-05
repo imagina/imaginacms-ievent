@@ -2,99 +2,130 @@
 
 namespace Modules\Ievent\Repositories\Eloquent;
 
+use Modules\Ievent\Entities\Status;
+use Modules\Ievent\Events\EventWasCancelled;
+use Modules\Ievent\Events\EventWasUpdated;
 use Modules\Ievent\Repositories\EventRepository;
 use Modules\Core\Repositories\Eloquent\EloquentBaseRepository;
-
-use Modules\Ievent\Entities\Status;
-
-//Events media
-use Modules\Ihelpers\Events\CreateMedia;
-use Modules\Ihelpers\Events\UpdateMedia;
-use Modules\Ihelpers\Events\DeleteMedia;
-
-use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Modules\Ievent\Events\EventWasCreated;
 
 class EloquentEventRepository extends EloquentBaseRepository implements EventRepository
 {
-
-  public function getItemsBy($params)
+  public function getItemsBy($params = false)
   {
-    // INITIALIZE QUERY
+    /*== initialize query ==*/
     $query = $this->model->query();
+
     /*== RELATIONSHIPS ==*/
     if (in_array('*', $params->include)) {//If Request all relationships
       $query->with([]);
     } else {//Especific relationships
-      $includeDefault = ['translations'];//Default relationships
+      $includeDefault = ['files'];//Default relationships
       if (isset($params->include))//merge relations with default relationships
         $includeDefault = array_merge($includeDefault, $params->include);
       $query->with($includeDefault);//Add Relationships to query
     }
-    // FILTERS
-    if ($params->filter) {
-      $filter = $params->filter;
-      //add filter by search
-      if (isset($filter->search)) {
-        //find search in columns
-        $query->where(function ($query) use ($filter) {
-          $query->whereHas('translations', function ($query) use ($filter) {
-            $query->where('locale', $filter->locale)
-              ->where('title', 'like', '%' . $filter->search . '%');
-          })->orWhere('id', 'like', '%' . $filter->search . '%')
-            ->orWhere('updated_at', 'like', '%' . $filter->search . '%')
-            ->orWhere('created_at', 'like', '%' . $filter->search . '%');
-        });
-      }
+
+    /*== FILTERS ==*/
+    if (isset($params->filter)) {
+      $filter = $params->filter;//Short filter
+
       //Filter by date
       if (isset($filter->date)) {
         $date = $filter->date;//Short filter date
-        $date->field = $date->field ?? 'created_at';
+        $date->field = $date->field ?? 'date';
         if (isset($date->from))//From a date
           $query->whereDate($date->field, '>=', $date->from);
         if (isset($date->to))//to a date
           $query->whereDate($date->field, '<=', $date->to);
+      } else {
+        $query->whereRaw("date >= '" . date('Y-m-d') . "' and hour >= '" . date('H:i:s') . "'");
       }
+
+      //add filter all Events to square view
+      if (isset($params->department->id)) {
+        $query->where("department_id", $params->department->id);
+      } else {
+        //add filter by departments id
+        $query->where(function ($query) use ($filter, $params) {
+          //$user = $params->user;
+          $departments = $params->departments->pluck('id')->toArray();
+          $query->where(function ($query) use ($filter, $departments) {
+            $query->whereIn('department_id', $departments)
+              ->where('is_public', 0);
+          })->orWhere('is_public', 1);
+        });
+      }
+
+      //Department ID
+      if (isset($filter->departmentId)) {
+        $query->where("department_id", $filter->departmentId);
+      }
+
+      //Category ID
+      if (isset($filter->categoryId)) {
+        $query->where("category_id", $filter->categoryId);
+      }
+
+      //Status
+      if (isset($filter->status) && !is_null($filter->status)) {
+        $query->where("status", $filter->status);
+      }
+
+      //Place Category ID
+      if (isset($filter->placeCategoryId) && $filter->placeCategoryId) {
+        if (!is_array($filter->placeCategoryId)) $filter->placeCategoryId = [$filter->placeCategoryId];
+        $query->whereHas('place', function ($query) use ($filter) {
+          $query->whereIn("iplaces__places.category_id", $filter->placeCategoryId);
+        });
+      }
+
+      //Place City ID
+      if (isset($filter->placeCityId) && $filter->placeCityId) {
+        if (!is_array($filter->placeCityId)) $filter->placeCityId = [$filter->placeCityId];
+        $query->whereHas('place', function ($query) use ($filter) {
+          $query->whereIn("iplaces__places.city_id", $filter->placeCityId);
+        });
+      }
+
+      //by Attendants [ids]
+      if (isset($filter->attendants) && $filter->attendants) {
+        if (!is_array($filter->attendants)) $filter->attendants = [$filter->attendants];
+        $query->whereHas('attendants', function ($query) use ($filter) {
+          $query->whereIn("ievent__attendants.user_id", $filter->attendants);
+        });
+      }
+
       //Order by
       if (isset($filter->order)) {
         $orderByField = $filter->order->field ?? 'created_at';//Default field
         $orderWay = $filter->order->way ?? 'desc';//Default way
         $query->orderBy($orderByField, $orderWay);//Add order to query
+      } else {
+        $query->orderByRaw('date, hour');//Add order to query
       }
 
-      //Order by Now
-      if (isset($filter->orderByNow) && $filter->orderByNow ) {
-        $query->where('end_date','>=',date('Y-m-d'))->whereStatus(Status::PUBLISHED);
+      //add filter by search
+      if (isset($filter->search)) {
+        //find search in columns
+        $query->where(function ($query) use ($filter) {
+          $query->where('id', 'like', '%' . $filter->search . '%')
+            ->orWhere('title', 'like', '%' . $filter->search . '%')
+            ->orWhere('description', 'like', '%' . $filter->search . '%')
+            ->orWhere('updated_at', 'like', '%' . $filter->search . '%')
+            ->orWhere('created_at', 'like', '%' . $filter->search . '%');
+        });
       }
 
-      //Order by Now
-      if (isset($filter->status) && is_integer($filter->status)) {
-        $query->where('status', $filter->status);
-      }
-
-      //Filter by parent ID
-      if (isset($filter->parentId)) {
-        $query->where("parent_id", $filter->parentId);
-      }
-
-      //Filter by category Id
-      if (isset($filter->categoryId)) {
-        $query->where("category_id", $filter->categoryId);
-      }
-
-      //Filter by month
-      if (isset($filter->month)) {
-        $query->whereMonth('start_date',"=",$filter->month);
-      }
-
-      //Filter by year
-      if (isset($filter->year)) {
-        $query->whereYear('start_date',"=",$filter->year);
-      }
 
     }
+
     /*== FIELDS ==*/
     if (isset($params->fields) && count($params->fields))
       $query->select($params->fields);
+
+    // dd($query->toSql(),$query->getBindings());
     /*== REQUEST ==*/
     if (isset($params->page) && $params->page) {
       return $query->paginate($params->take);
@@ -103,70 +134,68 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
       return $query->get();
     }
   }
+
+
   public function getItem($criteria, $params = false)
   {
-    // INITIALIZE QUERY
+    //Initialize query
     $query = $this->model->query();
+
     /*== RELATIONSHIPS ==*/
     if (in_array('*', $params->include)) {//If Request all relationships
       $query->with([]);
     } else {//Especific relationships
-      $includeDefault = ['translations'];//Default relationships
+      $includeDefault = ['place'];//Default relationships
       if (isset($params->include))//merge relations with default relationships
         $includeDefault = array_merge($includeDefault, $params->include);
       $query->with($includeDefault);//Add Relationships to query
     }
-    /*== FIELDS ==*/
-    if (is_array($params->fields) && count($params->fields))
-      $query->select($params->fields);
+
     /*== FILTER ==*/
     if (isset($params->filter)) {
       $filter = $params->filter;
+
       if (isset($filter->field))//Filter by specific field
         $field = $filter->field;
-      // find translatable attributes
-      $translatedAttributes = $this->model->translatedAttributes;
-      // filter by translatable attributes
-      if (isset($field) && in_array($field, $translatedAttributes))//Filter by slug
-        $query->whereHas('translations', function ($query) use ($criteria, $filter, $field) {
-          $query->where('locale', $filter->locale)
-            ->where($field, $criteria);
-        });
-      else
-        // find by specific attribute or by id
-        $query->where($field ?? 'id', $criteria);
     }
+
+    /*== FIELDS ==*/
+    if (isset($params->fields) && count($params->fields))
+      $query->select($params->fields);
+
     /*== REQUEST ==*/
-    return $query->first();
+    return $query->where($field ?? 'id', $criteria)->first();
   }
+
+
   public function create($data)
   {
-    $category = $this->model->create($data);
-    if ($category) {
-      $category->categories()->sync(Arr::get($data, 'categories', []));
+    $event = $this->model->create($data);
+
+
+    if (isset($data["options"]["mainImage"])) {
+      $mainImage = $data["options"]["mainImage"];
+
+      if (Str::contains($mainImage, 'data:image/'))
+        $data["options"]["mainImage"] = saveImage($mainImage, "assets/ievent/event" . $event->id . ".jpg");
+      else {
+        $data["options"]["mainImage"] = 'modules/iblog/img/category/default.jpg';
+      }
     }
-    event(new CreateMedia($category, $data));
-    return $category;
-  }
 
-  public function update($model, $data)
-  {
-      $model->update($data);
+    if (isset($data["options"]["secondaryImage"])) {
+      $secondaryImage = $data["options"]["secondaryImage"];
 
-      $model->categories()->sync(Arr::get($data, 'categories', []));
+      if (Str::contains($secondaryImage, 'data:image/'))
+        $data["options"]["secondaryImage"] = saveImage($secondaryImage, "assets/ievent/event" . $event->id . ".jpg");
+      else {
+        $data["options"]["secondaryImage"] = url('modules/iblog/img/category/default.jpg');
+      }
+    }
 
-      event(new UpdateMedia($model, $data));//Event to Update media
-
-      return $model;
-  }
-
-  public function destroy($model){
-
-    $model->delete();
-
-    //Event to Delete media
-    event(new DeleteMedia($model->id, get_class($model)));
-
+    $event->update($data);
+    event(new EventWasCreated($event));
+    return $event;
   }
 
 
@@ -174,45 +203,62 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
   {
     /*== initialize query ==*/
     $query = $this->model->query();
+
     /*== FILTER ==*/
     if (isset($params->filter)) {
       $filter = $params->filter;
+
       //Update by field
-      if (isset($filter->field))
-        $field = $filter->field;
+      if (isset($filter->field)) $field = $filter->field;
     }
-    /*== REQUEST ==*/
+
+    //Get model
     $model = $query->where($field ?? 'id', $criteria)->first();
     if ($model) {
-      $model->categories()->sync(Arr::get($data, 'categories', []));
+      //Validate status
+      if (isset($data["status"])) {
+        //Check if isn't cancelled
+        if (($data["status"] == Status::CANCELLED) && $model->status) {
+          event(new EventWasCancelled($model, $params->user));
+        } else if ($data["status"] == Status::PUBLISHED) {
+          event(new EventWasUpdated($model, $params->user));
+        }
+      }
+
+      //Update Model
+      $model->update((array)$data);
     }
-    event(new UpdateMedia($model, $data));//Event to Update media
-    return $model ? $model->update((array)$data) : false;
+
+    return $model;
   }
+
+
   public function deleteBy($criteria, $params = false)
   {
     /*== initialize query ==*/
     $query = $this->model->query();
+
     /*== FILTER ==*/
     if (isset($params->filter)) {
       $filter = $params->filter;
+
       if (isset($filter->field))//Where field
         $field = $filter->field;
     }
+
     /*== REQUEST ==*/
     $model = $query->where($field ?? 'id', $criteria)->first();
-    event(new DeleteMedia($model->id, get_class($model)));//Event to Delete media
-    $model ? $model->delete() : false;
+
+    if ($model) {
+      $id = $model->id;
+      $model->comments()->delete();
+
+      deleteImage(str_replace(env('APP_URL'), '', $model->options->mainImage));
+      $model->delete();
+
+    }
+
   }
 
-  public function whereCategory($id)
-  {
-      $query = $this->model->with('categories','category', 'user', 'translations');
-      $query->whereHas('categories', function ($q) use ($id) {
-          $q->where('category_id', $id);
-      })->whereStatus(Status::PUBLISHED)->where('created_at', '<', date('Y-m-d H:i:s'))->orderBy('created_at', 'DESC');
-
-      return $query->paginate(12);
-  }
 
 }

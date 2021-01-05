@@ -4,68 +4,47 @@ namespace Modules\Ievent\Entities;
 
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Iplaces\Entities\Place;
+use Modules\Iplaces\Entities\Route;
+use Modules\Iprofile\Entities\Department;
 use Modules\Media\Support\Traits\MediaRelation;
+use Modules\Media\Entities\File;
+use Modules\User\Entities\Sentinel\User;
+use Modules\Ievent\Transformers\ServiceCategoryTransformer;
 
 class Event extends Model
 {
-  use Translatable, MediaRelation;
+  use MediaRelation;
 
   protected $table = 'ievent__events';
+  protected $fillable = [
+    "title",
+    "slug",
+    "status",
+    "date",
+    "hour",
+    "is_public",
+    "description",
+    "category_id",
+    "place_id",
+    "user_id",
+    "department_id",
+    "options"
+  ];
 
   protected $fakeColumns = ['options'];
-
-  public $translatedAttributes = [
-    'summary',
-    'title',
-    'description',
-    'slug',
-    'meta_title',
-    'meta_description',
-    'meta_keywords',
-    'options_translate'
-  ];
-
-  protected $fillable = [
-    'start_date',
-    'end_date',
-    'repeat',
-    'all_day',
-    'address',
-    'lgt',
-    'lat',
-    'price',
-    'organizer_id',
-    'status',
-    'options',
-    'category_id',
-    'user_id',
-
-    'summary',
-    'title',
-    'description',
-    'slug',
-    'meta_title',
-    'meta_description',
-    'meta_keywords',
-    'options_translate'
-  ];
-
 
   protected $casts = [
     'options' => 'array'
   ];
+  protected $width = [
+    'team'
+  ];
 
-  public function getOptionsAttribute($value)
+  public function user()
   {
-    try {
-      return json_decode(json_decode($value));
-    } catch (\Exception $e) {
-      return json_decode($value);
-    }
-  }
-
-  public function categories(){
-    return $this->belongsToMany(Category::class, 'ievent__category_event');
+    $driver = config('asgard.user.config.driver');
+    return $this->belongsTo("Modules\\User\\Entities\\{$driver}\\User");
   }
 
   public function category()
@@ -73,80 +52,57 @@ class Event extends Model
     return $this->belongsTo(Category::class);
   }
 
-  public function user()
+  public function attendants()
   {
-      $driver = config('asgard.user.config.driver');
-      return $this->belongsTo("Modules\\User\\Entities\\{$driver}\\User");
+    return $this->hasMany(Attendant::class);
   }
 
-  public function getMainImageAttribute()
+  public function place()
   {
-    $thumbnail = $this->files()->where('zone', 'mainimage')->first();
-    if (!$thumbnail) {
-      if (isset($this->options->mainimage)) {
-        $image = [
-          'mimeType' => 'image/jpeg',
-          'path' => url($this->options->mainimage)
-        ];
-      } else {
-        $image = [
-          'mimeType' => 'image/jpeg',
-          'path' => url('modules/iblog/img/post/default.jpg')
-        ];
-      }
-    } else {
-      $image = [
-        'mimeType' => $thumbnail->mimetype,
-        'path' => $thumbnail->path_string
-      ];
-    }
-    return json_decode(json_encode($image));
+    return $this->belongsTo(Place::class)->with(['city', 'category']);
   }
 
-  public function getGalleryAttribute()
+  public function department()
   {
-    $gallery = $this->filesByZone('gallery')->get();
-    $response = [];
-    foreach ($gallery as $img) {
-      array_push($response, [
-        'mimeType' => $img->mimetype,
-        'path' => $img->path_string
-      ]);
-    }
-    return json_decode(json_encode($response));
+    return $this->belongsTo(Department::class);
   }
 
-
-  public function getUrlAttribute()
+  public function getAttendantsCountAttribute()
   {
-
-    if (!isset($this->category->slug)) {
-      $this->category = Category::take(1)->get()->first();
-    }
-
-    return \URL::route(\LaravelLocalization::getCurrentLocale() . '.ievent.event', [$this->category->slug,$this->slug]);
-
+    return $this->attendants->count();
   }
 
-  /**
-   * Magic Method modification to allow dynamic relations to other entities.
-   * @var $value
-   * @var $destination_path
-   * @return string
-   */
-  public function __call($method, $parameters)
+  public function getLastAttendantsAttribute()
   {
-    #i: Convert array to dot notation
-    $config = implode('.', ['asgard.ivent.config.relations.event', $method]);
+    return $this->attendants()->orderBy("id", "desc")->take(3)->get();
+  }
 
-    #i: Relation method resolver
-    if (config()->has($config)) {
-        $function = config()->get($config);
+  public function getStatusNameAttribute()
+  {
+    return (new Status())->get($this->status);
+  }
 
-        return $function($this);
-    }
+  public function getOptionsAttribute($value)
+  {
+    $options = json_decode($value);
 
-    #i: No relation found, return the call to parent (Eloquent) to handle it.
-    return parent::__call($method, $parameters);
+    if (isset($options->mainImage))
+      $options->mainImage = url($options->mainImage);
+    if (isset($options->secondaryImage))
+      $options->secondaryImage = url($options->secondaryImage);
+
+    return $options;
+  }
+
+  public function setOptionsAttribute($value)
+  {
+    $this->attributes['options'] = json_encode($value);
+  }
+
+  public function setUpdatedAtAttribute($value)
+  {
+    $this->attributes['updated_at'] = $value;
+    if (isset($this->id))
+      $this->save();
   }
 }

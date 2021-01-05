@@ -6,7 +6,7 @@ return [
     'edit resource' => 'Edit events',
     'destroy resource' => 'Destroy events',
     'title' => [
-        'events' => 'Events',
+        'events' => 'Event',
         'create event' => 'Create a event',
         'edit event' => 'Edit a event',
     ],
@@ -16,12 +16,6 @@ return [
     'table' => [
     ],
     'form' => [
-        'created at' => 'Created at',
-        'start at' => 'Start at',
-        'end at' => 'End at',
-        'address' => 'Address',
-        'price' => 'Price',
-        'hour' => 'Hour',
     ],
     'messages' => [
     ],

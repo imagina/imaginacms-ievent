@@ -37,14 +37,14 @@ class RegisterIeventSidebar implements \Maatwebsite\Sidebar\SidebarExtender
     public function extendWith(Menu $menu)
     {
         $menu->group(trans('core::sidebar.content'), function (Group $group) {
-            $group->item(trans('ievent::common.ievent'), function (Item $item) {
-                $item->icon('fa fa-calendar-check-o');
+            $group->item(trans('ievent::ievent.title.ievent'), function (Item $item) {
+                $item->icon('fa fa-copy');
                 $item->weight(10);
                 $item->authorize(
                      /* append */
                 );
                 $item->item(trans('ievent::categories.title.categories'), function (Item $item) {
-                    $item->icon('fa fa-list');
+                    $item->icon('fa fa-copy');
                     $item->weight(0);
                     $item->append('admin.ievent.category.create');
                     $item->route('admin.ievent.category.index');
@@ -52,17 +52,17 @@ class RegisterIeventSidebar implements \Maatwebsite\Sidebar\SidebarExtender
                         $this->auth->hasAccess('ievent.categories.index')
                     );
                 });
-                $item->item(trans('ievent::organizers.title.organizers'), function (Item $item) {
+                $item->item(trans('ievent::recurrencedays.title.recurrencedays'), function (Item $item) {
                     $item->icon('fa fa-copy');
                     $item->weight(0);
-                    $item->append('admin.ievent.organizer.create');
-                    $item->route('admin.ievent.organizer.index');
+                    $item->append('admin.ievent.recurrenceday.create');
+                    $item->route('admin.ievent.recurrenceday.index');
                     $item->authorize(
-                        $this->auth->hasAccess('ievent.organizers.index')
+                        $this->auth->hasAccess('ievent.recurrencedays.index')
                     );
                 });
                 $item->item(trans('ievent::events.title.events'), function (Item $item) {
-                    $item->icon('fa fa-calendar-o');
+                    $item->icon('fa fa-copy');
                     $item->weight(0);
                     $item->append('admin.ievent.event.create');
                     $item->route('admin.ievent.event.index');
@@ -70,16 +70,36 @@ class RegisterIeventSidebar implements \Maatwebsite\Sidebar\SidebarExtender
                         $this->auth->hasAccess('ievent.events.index')
                     );
                 });
-                $item->item(trans('ievent::tickets.title.tickets'), function (Item $item) {
+                $item->item(trans('ievent::recurrences.title.recurrences'), function (Item $item) {
                     $item->icon('fa fa-copy');
                     $item->weight(0);
-                    $item->append('admin.ievent.ticket.create');
-                    $item->route('admin.ievent.ticket.index');
+                    $item->append('admin.ievent.recurrence.create');
+                    $item->route('admin.ievent.recurrence.index');
                     $item->authorize(
-                        $this->auth->hasAccess('ievent.tickets.index')
+                        $this->auth->hasAccess('ievent.recurrences.index')
+                    );
+                });
+                $item->item(trans('ievent::attendants.title.attendants'), function (Item $item) {
+                    $item->icon('fa fa-copy');
+                    $item->weight(0);
+                    $item->append('admin.ievent.attendant.create');
+                    $item->route('admin.ievent.attendant.index');
+                    $item->authorize(
+                        $this->auth->hasAccess('ievent.attendants.index')
+                    );
+                });
+                $item->item(trans('ievent::comments.title.comments'), function (Item $item) {
+                    $item->icon('fa fa-copy');
+                    $item->weight(0);
+                    $item->append('admin.ievent.comment.create');
+                    $item->route('admin.ievent.comment.index');
+                    $item->authorize(
+                        $this->auth->hasAccess('ievent.comments.index')
                     );
                 });
 // append
+
+
 
 
 

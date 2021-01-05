@@ -7,7 +7,6 @@ use Modules\Core\Traits\CanPublishConfiguration;
 use Modules\Core\Events\BuildingSidebar;
 use Modules\Core\Events\LoadingBackendTranslations;
 use Modules\Ievent\Events\Handlers\RegisterIeventSidebar;
-
 use Illuminate\Support\Arr;
 
 class IeventServiceProvider extends ServiceProvider
@@ -32,10 +31,14 @@ class IeventServiceProvider extends ServiceProvider
 
         $this->app['events']->listen(LoadingBackendTranslations::class, function (LoadingBackendTranslations $event) {
             $event->load('categories', Arr::dot(trans('ievent::categories')));
-            $event->load('organizers', Arr::dot(trans('ievent::organizers')));
+            $event->load('recurrencedays', Arr::dot(trans('ievent::recurrencedays')));
             $event->load('events', Arr::dot(trans('ievent::events')));
-            $event->load('tickets', Arr::dot(trans('ievent::tickets')));
+            $event->load('recurrences', Arr::dot(trans('ievent::recurrences')));
+            $event->load('attendants', Arr::dot(trans('ievent::attendants')));
+            $event->load('comments', Arr::dot(trans('ievent::comments')));
             // append translations
+
+
 
 
 
@@ -45,6 +48,7 @@ class IeventServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->publishConfig('ievent', 'config');
         $this->publishConfig('ievent', 'permissions');
 
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
@@ -75,15 +79,15 @@ class IeventServiceProvider extends ServiceProvider
             }
         );
         $this->app->bind(
-            'Modules\Ievent\Repositories\OrganizerRepository',
+            'Modules\Ievent\Repositories\RecurrenceDayRepository',
             function () {
-                $repository = new \Modules\Ievent\Repositories\Eloquent\EloquentOrganizerRepository(new \Modules\Ievent\Entities\Organizer());
+                $repository = new \Modules\Ievent\Repositories\Eloquent\EloquentRecurrenceDayRepository(new \Modules\Ievent\Entities\RecurrenceDay());
 
                 if (! config('app.cache')) {
                     return $repository;
                 }
 
-                return new \Modules\Ievent\Repositories\Cache\CacheOrganizerDecorator($repository);
+                return new \Modules\Ievent\Repositories\Cache\CacheRecurrenceDayDecorator($repository);
             }
         );
         $this->app->bind(
@@ -99,29 +103,44 @@ class IeventServiceProvider extends ServiceProvider
             }
         );
         $this->app->bind(
-            'Modules\Ievent\Repositories\TicketRepository',
+            'Modules\Ievent\Repositories\RecurrenceRepository',
             function () {
-                $repository = new \Modules\Ievent\Repositories\Eloquent\EloquentTicketRepository(new \Modules\Ievent\Entities\Ticket());
+                $repository = new \Modules\Ievent\Repositories\Eloquent\EloquentRecurrenceRepository(new \Modules\Ievent\Entities\Recurrence());
 
                 if (! config('app.cache')) {
                     return $repository;
                 }
 
-                return new \Modules\Ievent\Repositories\Cache\CacheTicketDecorator($repository);
+                return new \Modules\Ievent\Repositories\Cache\CacheRecurrenceDecorator($repository);
             }
         );
+        $this->app->bind(
+            'Modules\Ievent\Repositories\AttendantRepository',
+            function () {
+                $repository = new \Modules\Ievent\Repositories\Eloquent\EloquentAttendantRepository(new \Modules\Ievent\Entities\Attendant());
 
-      $this->app->bind(
-        'Modules\Ievent\Repositories\UserRepository',
-        function () {
-          $repository = new \Modules\Ievent\Repositories\Eloquent\EloquentUserRepository(new \Modules\Ievent\Entities\User());
-          if (!config('app.cache')) {
-            return $repository;
-          }
-          return new \Modules\Ievent\Repositories\Cache\CacheUserApiDecorator($repository);
-        }
-      );
+                if (! config('app.cache')) {
+                    return $repository;
+                }
+
+                return new \Modules\Ievent\Repositories\Cache\CacheAttendantDecorator($repository);
+            }
+        );
+        $this->app->bind(
+            'Modules\Ievent\Repositories\CommentRepository',
+            function () {
+                $repository = new \Modules\Ievent\Repositories\Eloquent\EloquentCommentRepository(new \Modules\Ievent\Entities\Comment());
+
+                if (! config('app.cache')) {
+                    return $repository;
+                }
+
+                return new \Modules\Ievent\Repositories\Cache\CacheCommentDecorator($repository);
+            }
+        );
 // add bindings
+
+
 
 
 

@@ -13,6 +13,8 @@ class CacheEventDecorator extends BaseCacheDecorator implements EventRepository
         $this->entityName = 'ievent.events';
         $this->repository = $event;
     }
+  
+  
   /**
    * List or resources
    *
@@ -24,7 +26,8 @@ class CacheEventDecorator extends BaseCacheDecorator implements EventRepository
       return $this->repository->getItemsBy($params);
     });
   }
-
+  
+  
   /**
    * find a resource by id or slug
    *
@@ -36,7 +39,8 @@ class CacheEventDecorator extends BaseCacheDecorator implements EventRepository
       return $this->repository->getItem($criteria, $params);
     });
   }
-
+  
+  
   /**
    * create a resource
    *
@@ -45,10 +49,9 @@ class CacheEventDecorator extends BaseCacheDecorator implements EventRepository
   public function create($data)
   {
     $this->clearCache();
-
     return $this->repository->create($data);
   }
-
+  
   /**
    * update a resource
    *
@@ -57,10 +60,11 @@ class CacheEventDecorator extends BaseCacheDecorator implements EventRepository
   public function updateBy($criteria, $data, $params)
   {
     $this->clearCache();
-
+    
     return $this->repository->updateBy($criteria, $data, $params);
   }
-
+  
+  
   /**
    * destroy a resource
    *
@@ -69,7 +73,8 @@ class CacheEventDecorator extends BaseCacheDecorator implements EventRepository
   public function deleteBy($criteria, $params)
   {
     $this->clearCache();
-
+    
     return $this->repository->deleteBy($criteria, $params);
   }
+  
 }

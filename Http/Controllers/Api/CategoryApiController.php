@@ -2,32 +2,25 @@
 
 namespace Modules\Ievent\Http\Controllers\Api;
 
-// Requests & Response
-use Modules\Ievent\Http\Requests\CreateCategoryRequest;
-use Modules\Ievent\Http\Requests\UpdateCategoryRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-
-// Base Api
+use Illuminate\Routing\Controller;
 use Modules\Ihelpers\Http\Controllers\Api\BaseApiController;
-
-// Transformers
-use Modules\Ievent\Transformers\CategoryTransformer;
-
-// Entities
-use Modules\Ievent\Entities\Category;
-
-// Repositories
 use Modules\Ievent\Repositories\CategoryRepository;
+use Modules\Ievent\Transformers\CategoryTransformer;
+use Modules\Ievent\Http\Requests\CreateCategoryRequest;
+use Modules\Ievent\Http\Requests\UpdateCategoryRequest;
 
 class CategoryApiController extends BaseApiController
 {
-  private $entity;
 
-  public function __construct(CategoryRepository $entity)
+  private $category;
+
+  public function __construct(CategoryRepository $category)
   {
-    $this->entity = $entity;
+    $this->category = $category;
   }
+
   /**
    * GET ITEMS
    *
@@ -39,18 +32,24 @@ class CategoryApiController extends BaseApiController
       //Get Parameters from URL.
       $params = $this->getParamsRequest($request);
       //Request to Repository
-      $categories = $this->entity->getItemsBy($params);
+      $categories = $this->category->getItemsBy($params);
+
       //Response
-      $response = ["data" => CategoryTransformer::collection($categories)];
+      $response = [
+        "data" => CategoryTransformer::collection($categories)
+      ];
+
       //If request pagination add meta-page
       $params->page ? $response["meta"] = ["page" => $this->pageTransformer($categories)] : false;
     } catch (\Exception $e) {
       $status = $this->getStatusError($e->getCode());
       $response = ["errors" => $e->getMessage()];
     }
+
     //Return response
-    return response()->json($response ?? ["data" => "Request successful"], $status ?? 200);
+    return response()->json($response, $status ?? 200);
   }
+
   /**
    * GET A ITEM
    *
@@ -62,21 +61,27 @@ class CategoryApiController extends BaseApiController
     try {
       //Get Parameters from URL.
       $params = $this->getParamsRequest($request);
+
       //Request to Repository
-      $category = $this->entity->getItem($criteria, $params);
+      $category = $this->category->getItem($criteria, $params);
+
       //Break if no found item
-      if (!$category) throw new Exception('Item not found', 204);
+      if (!$category) throw new Exception('Item not found', 404);
+
       //Response
       $response = ["data" => new CategoryTransformer($category)];
+
       //If request pagination add meta-page
       $params->page ? $response["meta"] = ["page" => $this->pageTransformer($category)] : false;
     } catch (\Exception $e) {
       $status = $this->getStatusError($e->getCode());
       $response = ["errors" => $e->getMessage()];
     }
+
     //Return response
-    return response()->json($response ?? ["data" => "Request successful"], $status ?? 200);
+    return response()->json($response, $status ?? 200);
   }
+
   /**
    * CREATE A ITEM
    *
@@ -87,13 +92,17 @@ class CategoryApiController extends BaseApiController
   {
     \DB::beginTransaction();
     try {
-      $data = $request->input('attributes') ?? [];//Get data
+      //Get data
+      $data = $request->input('attributes');
+
       //Validate Request
-      $this->validateRequestApi(new CreateCategoryRequest($data));
+      $this->validateRequestApi(new CreateCategoryRequest((array)$data));
+
       //Create item
-      $category = $this->entity->create($data);
+      $this->category->create($data);
+
       //Response
-      $response = ["data" => new CategoryTransformer($category)];
+      $response = ["data" => ""];
       \DB::commit(); //Commit to Data Base
     } catch (\Exception $e) {
       \DB::rollback();//Rollback to Data Base
@@ -101,36 +110,50 @@ class CategoryApiController extends BaseApiController
       $response = ["errors" => $e->getMessage()];
     }
     //Return response
-    return response()->json($response ?? ["data" => "Request successful"], $status ?? 200);
+    return response()->json($response, $status ?? 200);
   }
+
   /**
-   * Update the specified resource in storage.
-   * @param  Request $request
-   * @return Response
+   * UPDATE ITEM
+   *
+   * @param $criteria
+   * @param Request $request
+   * @return mixed
    */
   public function update($criteria, Request $request)
   {
-    \DB::beginTransaction();
+    \DB::beginTransaction(); //DB Transaction
     try {
-      $params = $this->getParamsRequest($request);
+      //Get data
       $data = $request->input('attributes');
+
       //Validate Request
-      $this->validateRequestApi(new UpdateCategoryRequest($data));
-      //Update data
-      $category = $this->entity->updateBy($criteria, $data, $params);
+      $this->validateRequestApi(new UpdateCategoryRequest((array)$data));
+
+      //Get Parameters from URL.
+      $params = $this->getParamsRequest($request);
+
+      //Request to Repository
+      $this->category->updateBy($criteria, $data, $params);
+
       //Response
-      $response = ['data' => 'Item Updated'];
-      \DB::commit(); //Commit to Data Base
+      $response = ["data" => 'Item Updated'];
+      \DB::commit();//Commit to DataBase
     } catch (\Exception $e) {
       \DB::rollback();//Rollback to Data Base
       $status = $this->getStatusError($e->getCode());
       $response = ["errors" => $e->getMessage()];
     }
+
+    //Return response
     return response()->json($response, $status ?? 200);
   }
+
   /**
-   * Remove the specified resource from storage.
-   * @return Response
+   * DELETE A ITEM
+   *
+   * @param $criteria
+   * @return mixed
    */
   public function delete($criteria, Request $request)
   {
@@ -138,16 +161,21 @@ class CategoryApiController extends BaseApiController
     try {
       //Get params
       $params = $this->getParamsRequest($request);
-      //Delete data
-      $this->entity->deleteBy($criteria, $params);
+
+      //call Method delete
+      $this->category->deleteBy($criteria, $params);
+
       //Response
-      $response = ['data' => ''];
-      \DB::commit(); //Commit to Data Base
+      $response = ["data" => ""];
+      \DB::commit();//Commit to Data Base
     } catch (\Exception $e) {
       \DB::rollback();//Rollback to Data Base
       $status = $this->getStatusError($e->getCode());
       $response = ["errors" => $e->getMessage()];
     }
+
+    //Return response
     return response()->json($response, $status ?? 200);
   }
+
 }

@@ -10,7 +10,6 @@ use Modules\Ievent\Http\Requests\UpdateCategoryRequest;
 use Modules\Ievent\Repositories\CategoryRepository;
 use Modules\Core\Http\Controllers\Admin\AdminBaseController;
 
-
 class CategoryController extends AdminBaseController
 {
     /**
@@ -32,8 +31,9 @@ class CategoryController extends AdminBaseController
      */
     public function index()
     {
-        $categories = $this->category->all();
-        return view('ievent::admin.categories.index', compact('categories'));
+        //$categories = $this->category->all();
+
+        return view('ievent::admin.categories.index', compact(''));
     }
 
     /**
@@ -43,8 +43,7 @@ class CategoryController extends AdminBaseController
      */
     public function create()
     {
-        $categories = $this->category->all();
-        return view('ievent::admin.categories.create',compact('categories'));
+        return view('ievent::admin.categories.create');
     }
 
     /**
@@ -67,12 +66,9 @@ class CategoryController extends AdminBaseController
      * @param  Category $category
      * @return Response
      */
-    public function edit($categoryId)
+    public function edit(Category $category)
     {
-       
-        $category = $this->category->find($categoryId);
-        $categories = $this->category->all();
-        return view('ievent::admin.categories.edit', compact('category','categories'));
+        return view('ievent::admin.categories.edit', compact('category'));
     }
 
     /**
@@ -82,11 +78,8 @@ class CategoryController extends AdminBaseController
      * @param  UpdateCategoryRequest $request
      * @return Response
      */
-    public function update($categoryId, UpdateCategoryRequest $request)
+    public function update(Category $category, UpdateCategoryRequest $request)
     {
-
-        $category = $this->category->find($categoryId);
-
         $this->category->update($category, $request->all());
 
         return redirect()->route('admin.ievent.category.index')
@@ -99,22 +92,11 @@ class CategoryController extends AdminBaseController
      * @param  Category $category
      * @return Response
      */
-    public function destroy($categoryId)
+    public function destroy(Category $category)
     {
+        $this->category->destroy($category);
 
-        $category = $this->category->find($categoryId);
-
-        try {
-            $this->category->destroy($category);
-
-            return redirect()->route('admin.ievent.category.index')
-                ->withSuccess(trans('core::core.messages.resource deleted', ['name' => trans('ievent::categories.title.categories')]));
-
-         } catch (\Exception $e) {
-            \Log::error($e);
-            return redirect()->back()
-                ->withError(trans('core::core.messages.resource error', ['name' => trans('ievent::category.title.categories')]));
-
-        }
+        return redirect()->route('admin.ievent.category.index')
+            ->withSuccess(trans('core::core.messages.resource deleted', ['name' => trans('ievent::categories.title.categories')]));
     }
 }

@@ -2,32 +2,32 @@
 
 namespace Modules\Ievent\Http\Controllers\Api;
 
-// Requests & Response
-use Modules\Ievent\Http\Requests\CreateEventRequest;
-use Modules\Ievent\Http\Requests\UpdateEventRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-
-// Base Api
-use Modules\Ihelpers\Http\Controllers\Api\BaseApiController;
-
-// Transformers
+use Illuminate\Routing\Controller;
+use Modules\Ievent\Entities\Status;
+use Modules\Ievent\Events\EventWasCancelled;
+use Modules\Ievent\Events\EventWasUpdated;
 use Modules\Ievent\Transformers\EventTransformer;
-
-// Entities
-use Modules\Ievent\Entities\Event;
-
-// Repositories
+use Modules\Ievent\Transformers\EventPublicTransformer;
+use Modules\Ihelpers\Http\Controllers\Api\BaseApiController;
 use Modules\Ievent\Repositories\EventRepository;
+use Modules\Ievent\Http\Requests\CreateEventRequest;
+use Modules\Ievent\Http\Requests\UpdateEventRequest;
+use Modules\Notification\Services\Inotification;
 
 class EventApiController extends BaseApiController
 {
-  private $entity;
 
-  public function __construct(EventRepository $entity)
+  private $event;
+  private $notification;
+
+  public function __construct(EventRepository $event, Inotification $notification)
   {
-    $this->entity = $entity;
+    $this->event = $event;
+    $this->notification = $notification;
   }
+
   /**
    * GET ITEMS
    *
@@ -36,21 +36,29 @@ class EventApiController extends BaseApiController
   public function index(Request $request)
   {
     try {
+
       //Get Parameters from URL.
       $params = $this->getParamsRequest($request);
+
       //Request to Repository
-      $categories = $this->entity->getItemsBy($params);
+      $events = $this->event->getItemsBy($params);
+
       //Response
-      $response = ["data" => EventTransformer::collection($categories)];
+      $response = [
+        "data" => EventTransformer::collection($events)
+      ];
+
       //If request pagination add meta-page
-      $params->page ? $response["meta"] = ["page" => $this->pageTransformer($categories)] : false;
+      $params->page ? $response["meta"] = ["page" => $this->pageTransformer($events)] : false;
     } catch (\Exception $e) {
       $status = $this->getStatusError($e->getCode());
       $response = ["errors" => $e->getMessage()];
     }
+
     //Return response
-    return response()->json($response ?? ["data" => "Request successful"], $status ?? 200);
+    return response()->json($response, $status ?? 200);
   }
+
   /**
    * GET A ITEM
    *
@@ -62,21 +70,27 @@ class EventApiController extends BaseApiController
     try {
       //Get Parameters from URL.
       $params = $this->getParamsRequest($request);
+
       //Request to Repository
-      $category = $this->entity->getItem($criteria, $params);
+      $event = $this->event->getItem($criteria, $params);
+
       //Break if no found item
-      if (!$category) throw new Exception('Item not found', 204);
+      if (!$event) throw new \Exception('Item not found', 404);
+
       //Response
-      $response = ["data" => new EventTransformer($category)];
+      $response = ["data" => new EventTransformer($event)];
+
       //If request pagination add meta-page
-      $params->page ? $response["meta"] = ["page" => $this->pageTransformer($category)] : false;
+      $params->page ? $response["meta"] = ["page" => $this->pageTransformer($event)] : false;
     } catch (\Exception $e) {
       $status = $this->getStatusError($e->getCode());
       $response = ["errors" => $e->getMessage()];
     }
+
     //Return response
-    return response()->json($response ?? ["data" => "Request successful"], $status ?? 200);
+    return response()->json($response, $status ?? 200);
   }
+
   /**
    * CREATE A ITEM
    *
@@ -87,50 +101,81 @@ class EventApiController extends BaseApiController
   {
     \DB::beginTransaction();
     try {
-      $data = $request->input('attributes') ?? [];//Get data
+
+      //Get data
+      $data = $request->input('attributes');
+
+
+      //Get Parameters from URL.
+      $params = $this->getParamsRequest($request);
+
       //Validate Request
-      $this->validateRequestApi(new CreateEventRequest($data));
+      $this->validateRequestApi(new CreateEventRequest((array)$data));
+
+
+      $data["user_id"] = $params->user->id;
+      //$data["department_id"] = $params->department->id;
       //Create item
-      $category = $this->entity->create($data);
-      //Response
-      $response = ["data" => new EventTransformer($category)];
+      $event = $this->event->create($data);
+
+     //Response
+      $response = ["data" => ""];
       \DB::commit(); //Commit to Data Base
+
     } catch (\Exception $e) {
       \DB::rollback();//Rollback to Data Base
       $status = $this->getStatusError($e->getCode());
       $response = ["errors" => $e->getMessage()];
     }
     //Return response
-    return response()->json($response ?? ["data" => "Request successful"], $status ?? 200);
+    return response()->json($response, $status ?? 200);
   }
+
   /**
-   * Update the specified resource in storage.
-   * @param  Request $request
-   * @return Response
+   * UPDATE ITEM
+   *
+   * @param $criteria
+   * @param Request $request
+   * @return mixed
    */
   public function update($criteria, Request $request)
   {
-    \DB::beginTransaction();
+    \DB::beginTransaction(); //DB Transaction
     try {
-      $params = $this->getParamsRequest($request);
+      //Get data
       $data = $request->input('attributes');
+
+      unset($data["department_id"]);
       //Validate Request
-      $this->validateRequestApi(new UpdateEventRequest($data));
-      //Update data
-      $category = $this->entity->updateBy($criteria, $data, $params);
+      $this->validateRequestApi(new UpdateEventRequest((array)$data));
+
+      //Get Parameters from URL.
+      $params = $this->getParamsRequest($request);
+
+      $event = $this->event->updateBy($criteria, $data, $params);
+
+
+
       //Response
-      $response = ['data' => 'Item Updated'];
-      \DB::commit(); //Commit to Data Base
+      $response = ["data" => 'Item Updated'];
+      \DB::commit();//Commit to DataBase
+
+
     } catch (\Exception $e) {
       \DB::rollback();//Rollback to Data Base
       $status = $this->getStatusError($e->getCode());
       $response = ["errors" => $e->getMessage()];
     }
+
+    //Return response
     return response()->json($response, $status ?? 200);
   }
+
   /**
-   * Remove the specified resource from storage.
-   * @return Response
+   * DELETE A ITEM
+   *
+   * @param $criteria
+   * @return mixed
    */
   public function delete($criteria, Request $request)
   {
@@ -138,16 +183,52 @@ class EventApiController extends BaseApiController
     try {
       //Get params
       $params = $this->getParamsRequest($request);
-      //Delete data
-      $this->entity->deleteBy($criteria, $params);
+
+      //call Method delete
+      $this->event->deleteBy($criteria, $params);
+
       //Response
-      $response = ['data' => ''];
-      \DB::commit(); //Commit to Data Base
+      $response = ["data" => ""];
+      \DB::commit();//Commit to Data Base
     } catch (\Exception $e) {
       \DB::rollback();//Rollback to Data Base
       $status = $this->getStatusError($e->getCode());
       $response = ["errors" => $e->getMessage()];
     }
+
+    //Return response
+    return response()->json($response, $status ?? 200);
+  }
+
+  /**
+   * GET A ITEM PUBLIC
+   *
+   * @param $criteria
+   * @return mixed
+   */
+  public function showPublic($criteria, Request $request)
+  {
+    try {
+      //Get Parameters from URL.
+      $params = $this->getParamsRequest($request);
+
+      //Request to Repository
+      $event = $this->event->getItem($criteria, $params);
+
+      //Break if no found item
+      if (!$event) throw new \Exception('Item not found', 404);
+
+      //Response
+      $response = ["data" => new EventPublicTransformer($event)];
+
+      //If request pagination add meta-page
+      $params->page ? $response["meta"] = ["page" => $this->pageTransformer($event)] : false;
+    } catch (\Exception $e) {
+      $status = $this->getStatusError($e->getCode());
+      $response = ["errors" => $e->getMessage()];
+    }
+
+    //Return response
     return response()->json($response, $status ?? 200);
   }
 }

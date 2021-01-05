@@ -3,56 +3,31 @@
 namespace Modules\Ievent\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Support\Str;
 
 class CategoryTranslation extends Model
 {
-    use Sluggable;
-
     public $timestamps = false;
-
-    protected $fillable = [
-      'title',
-      'description',
-      'slug',
-      'meta_title',
-      'meta_description',
-      'meta_keywords',
-      'options_translate'
-    ];
     protected $table = 'ievent__category_translations';
 
-    protected  $casts = [
-        'options_translate'=>'array'
-    ];
-    public function getOptionsTranslateAttribute($value){
-        return json_decode($value);
+  protected $fillable = [
+    'title',
+    'slug',
+    'description'
+  ];
+
+  protected function setSlugAttribute($value){
+
+    if($this->parent_id==0){
+      if(!empty($value)){
+        $this->attributes['slug'] = Str::slug($value,'-');
+      }else{
+        $this->attributes['slug'] = Str::slug($this->title,'-');
+      }
+    }else{
+      $this->attributes['slug'] = $this->parent->slug.'/'.Str::slug($this->title,'-');
     }
 
-    public function sluggable()
-    {
-        return [
-            'slug' => [
-                'source' => 'title'
-            ]
-        ];
-    }
 
-    /**
-     * @return mixed
-     */
-    public function getMetaTitleAttribute(){
-
-        return $this->meta_title ?? $this->title;
-    }
-    public function getMetaDescriptionAttribute(){
-
-        return $this->meta_description ?? substr(strip_tags($this->description??''),0,150);
-    }
-    public function getUrlAttribute() {
-
-        return url($this->slug);
-
-    }
-
+  }
 }

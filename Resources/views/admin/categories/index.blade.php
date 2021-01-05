@@ -29,9 +29,6 @@
                         <table class="data-table table table-bordered table-hover">
                             <thead>
                             <tr>
-                                <th>{{ trans('ievent::categories.table.id') }}</th>
-                                <th>{{ trans('ievent::categories.table.title') }}</th>
-                                <th>{{ trans('ievent::categories.table.slug') }}</th>
                                 <th>{{ trans('core::core.table.created at') }}</th>
                                 <th data-sortable="false">{{ trans('core::core.table.actions') }}</th>
                             </tr>
@@ -39,16 +36,7 @@
                             <tbody>
                             <?php if (isset($categories)): ?>
                             <?php foreach ($categories as $category): ?>
-                            <tr> 
-                                <td>
-                                    {{ $category->id }}
-                                </td>
-                                <td>
-                                    {{ $category->title }}
-                                </td>
-                                <td>
-                                    {{ $category->slug }}
-                                </td>
+                            <tr>
                                 <td>
                                     <a href="{{ route('admin.ievent.category.edit', [$category->id]) }}">
                                         {{ $category->created_at }}
@@ -66,9 +54,6 @@
                             </tbody>
                             <tfoot>
                             <tr>
-                                <th>{{ trans('ievent::categories.table.id') }}</th>
-                                <th>{{ trans('ievent::categories.table.title') }}</th>
-                                <th>{{ trans('ievent::categories.table.slug') }}</th>
                                 <th>{{ trans('core::core.table.created at') }}</th>
                                 <th>{{ trans('core::core.table.actions') }}</th>
                             </tr>
