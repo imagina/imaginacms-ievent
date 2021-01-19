@@ -17,7 +17,7 @@ class CreateIeventEventsTable extends Migration
       $table->increments('id');
       $table->string('title');
       $table->string('slug');
-      $table->string('description', 160);
+      $table->text('description')->nullable();
       $table->integer('status')->default(1);
 
       $table->integer('category_id')->unsigned();
