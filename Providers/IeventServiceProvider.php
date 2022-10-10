@@ -54,7 +54,7 @@ class IeventServiceProvider extends ServiceProvider
       $this->mergeConfigFrom($this->getModuleConfigFilePath('ievent', 'cmsPages'), "asgard.ievent.cmsPages");
       $this->mergeConfigFrom($this->getModuleConfigFilePath('ievent', 'cmsSidebar'), "asgard.ievent.cmsSidebar");
 
-        $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
+        //$this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
     }
 
     /**
