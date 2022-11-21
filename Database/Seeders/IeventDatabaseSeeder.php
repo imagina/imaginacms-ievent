@@ -16,6 +16,7 @@ class IeventDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
+        $this->call(IeventModuleTableSeeder::class);
         // $this->call("OthersTableSeeder");
     }
 }
