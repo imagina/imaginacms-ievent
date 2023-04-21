@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Comment extends Model
 {
 
+  use AuditTrait;
+
     protected $table = 'ievent__comments';
     protected $fillable = [
       'message',

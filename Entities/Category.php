@@ -9,7 +9,7 @@ use Modules\Media\Entities\File;
 
 class Category extends Model
 {
-  use Translatable, MediaRelation;
+  use Translatable, MediaRelation, AuditTrait;
 
   protected $table = 'ievent__categories';
   public $translatedAttributes = [

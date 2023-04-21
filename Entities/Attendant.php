@@ -5,10 +5,13 @@ namespace Modules\Ievent\Entities;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Modules\User\Entities\Sentinel\User;
+use Modules\Core\Support\Traits\AuditTrait;
 
 class Attendant extends Model
 {
 
+  use AuditTrait;
+  
   protected $table = 'ievent__attendants';
   protected $fillable = [
     'user_id',

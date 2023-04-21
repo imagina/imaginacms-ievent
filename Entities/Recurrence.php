@@ -9,7 +9,7 @@ use Modules\Media\Entities\File;
 
 class Recurrence extends Model
 {
-  use MediaRelation;
+  use MediaRelation, AuditTrait;
 
     protected $table = 'ievent__recurrences';
 
