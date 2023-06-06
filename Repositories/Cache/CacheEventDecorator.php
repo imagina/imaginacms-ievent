@@ -33,7 +33,7 @@ class CacheEventDecorator extends BaseCacheDecorator implements EventRepository
    *
    * @return object
    */
-  public function getItem($criteria, $params)
+  public function getItem($criteria, $params = false)
   {
     return $this->remember(function () use ($criteria, $params) {
       return $this->repository->getItem($criteria, $params);
@@ -57,7 +57,7 @@ class CacheEventDecorator extends BaseCacheDecorator implements EventRepository
    *
    * @return mixed
    */
-  public function updateBy($criteria, $data, $params)
+  public function updateBy($criteria, $data, $params = false)
   {
     $this->clearCache();
     
@@ -70,7 +70,7 @@ class CacheEventDecorator extends BaseCacheDecorator implements EventRepository
    *
    * @return mixed
    */
-  public function deleteBy($criteria, $params)
+  public function deleteBy($criteria, $params = false)
   {
     $this->clearCache();
     
