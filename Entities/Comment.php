@@ -4,6 +4,7 @@ namespace Modules\Ievent\Entities;
 
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Support\Traits\AuditTrait;
 
 class Comment extends Model
 {
