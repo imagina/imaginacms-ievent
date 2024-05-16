@@ -3,6 +3,7 @@
 namespace Modules\Ievent\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Support\Traits\AuditTrait;
 
 class Comment extends Model
 {
