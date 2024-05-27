@@ -43,7 +43,7 @@ class EloquentEventRepository extends EloquentBaseRepository implements EventRep
                     $query->whereDate($date->field, '<=', $date->to);
                 }
             } else {
-                $query->whereRaw("date >= '".date('Y-m-d')."' and hour >= '".date('H:i:s')."'");
+                $query->whereRaw("CONCAT(date, ' ', hour) >= '".date("Y-m-d H:i:s")."'");
             }
 
             //add filter all Events to square view
