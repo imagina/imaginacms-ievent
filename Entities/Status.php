@@ -4,14 +4,12 @@ namespace Modules\Ievent\Entities;
 
 /**
  * Class Status
- * @package Modules\Ievent\Entities
  */
 class Status
 {
-    const DRAFT = 0;
-    const PENDING = 1;
-    const PUBLISHED = 2;
-    const UNPUBLISHED = 3;
+    const PUBLISHED = 1;
+
+    const CANCELLED = 0;
 
     /**
      * @var array
@@ -21,33 +19,28 @@ class Status
     public function __construct()
     {
         $this->statuses = [
-            self::DRAFT => trans('iblog::common.status.draft'),
-            self::PENDING => trans('iblog::common.status.pending'),
-            self::PUBLISHED => trans('iblog::common.status.published'),
-            self::UNPUBLISHED => trans('iblog::common.status.unpublished'),
+            self::PUBLISHED => trans('ievent::common.status.published'),
+            self::CANCELLED => trans('ievent::common.status.cancelled'),
         ];
     }
 
     /**
      * Get the available statuses
-     * @return array
      */
-    public function lists()
+    public function lists(): array
     {
         return $this->statuses;
     }
 
     /**
      * Get the post status
-     * @param int $statusId
-     * @return string
      */
-    public function get($statusId)
+    public function get(int $statusId): string
     {
         if (isset($this->statuses[$statusId])) {
             return $this->statuses[$statusId];
         }
 
-        return $this->statuses[self::DRAFT];
+        return $this->statuses[self::PUBLISHED];
     }
 }

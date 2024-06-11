@@ -2,17 +2,19 @@
 
 use Illuminate\Routing\Router;
 
-$router->group(['prefix' => '/ievent/v1'], function (Router $router) {
+Route::prefix('/ievent/v1')->group(function (Router $router) {
+    //======  EVENTS
+    require 'ApiRoutes/eventRoutes.php';
 
-  // Categories Routes
-  require('ApiRoutes/categoryRoutes.php');
+    //======  CATEGORIES
+    require 'ApiRoutes/categoryRoutes.php';
 
-  // Event Routes
-  require('ApiRoutes/eventRoutes.php');
+    //======  RECURRENCES
+    require 'ApiRoutes/recurrenceRoutes.php';
 
-  // Organizer Routes
-  require('ApiRoutes/organizerRoutes.php');
+    //======  ATTENDANTS
+    require 'ApiRoutes/attendantRoutes.php';
 
-  // Birthdays
-  require ('ApiRoutes/birthdayRoutes.php');
+    //======  COMMENTS
+    require 'ApiRoutes/commentRoutes.php';
 });

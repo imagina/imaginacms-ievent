@@ -2,110 +2,61 @@
 
 namespace Modules\Ievent\Entities;
 
-use Dimsav\Translatable\Translatable;
+use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
-use Laracasts\Presenter\PresentableTrait;
-use Modules\Core\Traits\NamespacedEntity;
-use Modules\Media\Entities\File;
 use Modules\Media\Support\Traits\MediaRelation;
+use Modules\Core\Support\Traits\AuditTrait;
 
 class Category extends Model
 {
-  use Translatable, MediaRelation, PresentableTrait,NamespacedEntity;
+    use Translatable, MediaRelation, AuditTrait;
 
-  protected $table = 'ievent__categories';
+    protected $table = 'ievent__categories';
 
-  protected $fakeColumns = ['options'];
+    public $translatedAttributes = [
+        'title',
+        'description',
+        'slug',
+    ];
 
-  public $translatedAttributes = [
-    'title',
-    'description',
-    'slug',
-    'meta_title',
-    'meta_description',
-    'meta_keywords',
-    'options_translate'
-  ];
-  protected $fillable = [
-    'title',
-    'description',
-    'slug',
-    'options_translate',
-    'meta_title',
-    'meta_description',
-    'meta_keywords',
-    'parent_id',
-    'options'
-  ];
-  protected  $casts = [
-      'options'=>'array'
-  ];
+    protected $fillable = [
+        'parent_id',
+        'place_category_id',
+        'status',
+        'options',
+    ];
 
-  public function parent(){
-    return $this->belongsTo(Category::class,'parent_id');
-  }
-
-  public function children(){
-    return $this->hasMany(Category::class, 'parent_id');
-  }
-
-  public function events(){
-    return $this->belongsToMany(Event::class,'ievent__category_event');
-  }
-
-  public function getOptionsAttribute($value){
-    try {
-      return json_decode(json_decode($value));
-    } catch (\Exception $e) {
-      return json_decode($value);
-    }
-  }
-
-  public function getMainImageAttribute()
+    public function parent()
     {
-        $thumbnail = $this->files()->where('zone', 'mainimage')->first();
-        if (!$thumbnail) {
-            if (isset($this->options->mainimage)) {
-                $image = [
-                    'mimeType' => 'image/jpeg',
-                    'path' => url($this->options->mainimage)
-                ];
-            } else {
-                $image = [
-                    'mimeType' => 'image/jpeg',
-                    'path' => url('modules/iblog/img/post/default.jpg')
-                ];
-            }
-        } else {
-            $image = [
-                'mimeType' => $thumbnail->mimetype,
-                'path' => $thumbnail->path_string
-            ];
+        return $this->belongsTo('Modules\Ievent\Entities\Category', 'parent_id');
+    }
+
+    public function placeCategory()
+    {
+        return $this->belongsTo(\Modules\Iplaces\Entities\Category::class, 'place_category_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany('Modules\Ievent\Entities\Category', 'parent_id');
+    }
+
+    public function getOptionsAttribute($value)
+    {
+        $options = json_decode($value);
+
+        if (isset($options->mainImage)) {
+            $options->mainImage = url($options->mainImage);
         }
-        return json_decode(json_encode($image));
+        if (isset($options->secondaryImage)) {
+            $options->secondaryImage = url($options->secondaryImage);
+        }
 
+        return $options;
     }
 
-  /**
-   * Magic Method modification to allow dynamic relations to other entities.
-   * @var $value
-   * @var $destination_path
-   * @return string
-   */
-  public function __call($method, $parameters)
-  {
-    #i: Convert array to dot notation
-    $config = implode('.', ['asgard.ivent.config.relations.category', $method]);
-
-    #i: Relation method resolver
-    if (config()->has($config)) {
-      $function = config()->get($config);
-
-      return $function($this);
+    public function setOptionsAttribute($value)
+    {
+        $this->attributes['options'] = json_encode($value);
     }
-
-    #i: No relation found, return the call to parent (Eloquent) to handle it.
-    return parent::__call($method, $parameters);
-  }
-
 }
